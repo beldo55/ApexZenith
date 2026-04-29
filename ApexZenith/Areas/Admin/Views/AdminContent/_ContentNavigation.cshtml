@@ -1,0 +1,19 @@
+@model string
+@{
+    var current = (Model ?? string.Empty).Trim();
+    string NavClass(string action) => string.Equals(current, action, StringComparison.OrdinalIgnoreCase)
+        ? "btn btn-primary btn-sm"
+        : "btn btn-outline-secondary btn-sm";
+}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-action="Index" class="@NavClass("Index")">Overview</a>
+    <a asp-action="About" class="@NavClass("About")">About</a>
+    <a asp-action="Addresses" class="@NavClass("Addresses")">Addresses</a>
+    <a asp-action="Services" class="@NavClass("Services")">Services</a>
+    <a asp-action="Clients" class="@NavClass("Clients")">Clients</a>
+    <a asp-action="TeamMembers" class="@NavClass("TeamMembers")">Team</a>
+    <a asp-action="Testimonials" class="@NavClass("Testimonials")">Testimonials</a>
+    <a asp-action="Categories" class="@NavClass("Categories")">Categories</a>
+    <a asp-action="News" class="@NavClass("News")">News</a>
+</div>

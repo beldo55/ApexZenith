@@ -1,0 +1,49 @@
+﻿@model HomePageViewModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<!-- Blog Posts Section -->
+<section id="blog-posts" class="blog-posts section">
+
+    <div class="container">
+        <div class="row gy-4">
+
+            @foreach (var item in Model.News)
+            {
+                <div class="col-lg-4">
+                    <article class="position-relative h-100">
+                        <div class="post-img position-relative overflow-hidden">
+                            <img src="@item.PhotoUrl" class="img-fluid" alt="">
+                            <span class="post-date">@item.Date.ToString("yyyy-MM-dd")</span>
+                        </div>
+                        <div class="post-content d-flex flex-column">
+                            <h3 class="post-title">@item.Headline</h3>
+                            <div class="meta d-flex align-items-center">
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-person"></i> <span class="ps-2">@item.Author</span>
+                                </div>
+                                <span class="px-3 text-black-50">/</span>
+                                <div class="d-flex align-items-center">
+                                    <i class="bi bi-folder2"></i> <span class="ps-2">@item.Category</span>
+                                </div>
+                            </div>
+                            <p>@item.Content</p>
+                            <hr>
+                            <a asp-action="NewsDetail" asp-route-id="@item.Id" class="readmore stretched-link">
+                                <span>Read More</span><i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </article>
+                </div>
+            }
+
+        </div>
+    </div>
+
+
+
+</section><!-- /Blog Pagination Section -->

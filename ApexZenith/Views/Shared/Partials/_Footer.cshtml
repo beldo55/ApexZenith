@@ -1,0 +1,46 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+<footer id="footer" class="footer dark-background">
+    <div class="container footer-top">
+        <div class="row gy-4">
+            <div class="col-lg-4 col-md-6 footer-about">
+                <a asp-controller="Home" asp-action="Index" class="logo d-flex align-items-center">
+                    <span class="sitename">ApexZenith</span>
+                </a>
+                <div class="footer-contact pt-3">
+                    <p>Lagos, Nigeria</p>
+                    <p>Available for remote and on-site collaboration</p>
+                    <p class="mt-3"><strong>Phone:</strong> <span>+234 800 000 0000</span></p>
+                    <p><strong>Email:</strong> <span>info@apexzenith.com</span></p>
+                </div>
+            </div>
+
+            <div class="col-lg-2 col-md-3 footer-links">
+                <h4>Useful Links</h4>
+                <ul>
+                    <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                    <li><a asp-controller="Home" asp-action="About">About us</a></li>
+                    <li><a asp-controller="Home" asp-action="Services">Services</a></li>
+                    <li><a href="#">Terms of service</a></li>
+                    <li><a href="#">Privacy policy</a></li>
+                </ul>
+            </div>
+
+            <div class="col-lg-4 col-md-12 footer-newsletter">
+                <h4>Company updates</h4>
+                <p>Follow our latest work, insights, and service updates.</p>
+                <form action="#" method="post">
+                    <div class="newsletter-form"><input type="email" name="email"><input type="submit" value="Subscribe"></div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="container copyright text-center mt-4">
+        <p>© <span>Copyright</span> <strong class="px-1 sitename">ApexZenith</strong> <span>All Rights Reserved</span></p>
+    </div>
+</footer>

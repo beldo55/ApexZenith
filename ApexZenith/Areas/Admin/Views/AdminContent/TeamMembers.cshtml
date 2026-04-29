@@ -1,0 +1,104 @@
+@model IReadOnlyList<ApexZenith.Models.Team>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Team content";
+}
+<partial name="_ContentNavigation" model="@("TeamMembers")" />
+<partial name="_ContentTableStyles" />
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <p class="text-secondary mb-0">Manage team members and profile links.</p>
+    <a asp-action="CreateTeam" asp-route-returnTo="TeamMembers" class="btn btn-primary btn-sm">Add Team Member</a>
+</div>
+
+<div class="card admin-table-card">
+    <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover content-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Photo</th>
+                    <th>Profiles</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-secondary">No team entries found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        var modalId = $"delete-team-{item.Id}";
+                        <tr>
+                            <td>@item.Id</td>
+                            <td>@item.Name</td>
+                            <td>@item.Position</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.PhotoUrl))
+                                {
+                                    <img src="@item.PhotoUrl" alt="@item.Name" class="table-img-preview" />
+                                }
+                                else
+                                {
+                                    <span class="text-secondary small">No photo</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
+                                    @if (!string.IsNullOrWhiteSpace(item.FacebookUrl))
+                                    {
+                                        <a href="@item.FacebookUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm"><i class="bi bi-facebook"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(item.InstergramUrl))
+                                    {
+                                        <a href="@item.InstergramUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm"><i class="bi bi-instagram"></i></a>
+                                    }
+                                    @if (!string.IsNullOrWhiteSpace(item.LinkedInUrl))
+                                    {
+                                        <a href="@item.LinkedInUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm"><i class="bi bi-linkedin"></i></a>
+                                    }
+                                </div>
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="EditTeam" asp-route-id="@item.Id" asp-route-returnTo="TeamMembers" class="btn btn-outline-primary">Edit</a>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#@modalId">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <div class="modal fade" id="@modalId" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Delete team member</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Delete team member <strong>@item.Name</strong>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form asp-action="DeleteTeam" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="returnTo" value="TeamMembers" />
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

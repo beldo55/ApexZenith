@@ -1,0 +1,165 @@
+@model ApexZenith.Areas.Admin.Models.UserManagementIndexViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "User management";
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="mb-2">Users</h5>
+                <div class="text-secondary">Create and maintain account records.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="card h-100">
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">Accounts</h5>
+                    <div class="text-secondary small">@Model.Users.Count user(s)</div>
+                </div>
+                <button class="btn btn-primary" type="button" id="addUserBtn"><i class="bi bi-plus-lg me-1"></i> Add user</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    <div class="alert alert-success">@statusMessage</div>
+}
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<div class="card admin-table-card">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Email</th>
+                    <th>Username</th>
+                    <th>Phone</th>
+                    <th>Status</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td>
+                        <div class="fw-semibold">@user.Email</div>
+                    </td>
+                    <td>@user.UserName</td>
+                    <td>@(string.IsNullOrWhiteSpace(user.PhoneNumber) ? "N/A" : user.PhoneNumber)</td>
+                    <td>
+                        <span class="badge @(user.EmailConfirmed ? "text-bg-success" : "text-bg-secondary")">
+                            @(user.EmailConfirmed ? "Confirmed" : "Pending")
+                        </span>
+                    </td>
+                    <td class="text-end">
+                        <button type="button" class="btn btn-outline-primary btn-sm me-1" data-user-id="@user.Id" data-edit-user>Edit</button>
+                        <form asp-action="Delete" method="post" class="d-inline">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="id" value="@user.Id" />
+                            <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Delete this user?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="userModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <form asp-action="Upsert" method="post">
+                @Html.AntiForgeryToken()
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalTitle">Add user</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+                    <input type="hidden" name="Id" id="User_Id" />
+                    <div class="row g-3">
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="User_Email">Email</label>
+                            <input name="Email" class="form-control" id="User_Email" />
+                            <span data-valmsg-for="Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="User_PhoneNumber">Phone number</label>
+                            <input name="PhoneNumber" class="form-control" id="User_PhoneNumber" />
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <div class="form-check mt-4">
+                                <input name="EmailConfirmed" class="form-check-input" type="checkbox" value="true" id="User_EmailConfirmed" />
+                                <input type="hidden" name="EmailConfirmed" value="false" />
+                                <label class="form-check-label" for="User_EmailConfirmed">Confirmed</label>
+                            </div>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="User_Password">Password</label>
+                            <input name="Password" class="form-control" id="User_Password" autocomplete="new-password" />
+                            <div class="form-text">Required for new users. Leave blank when editing to keep the current password.</div>
+                            <span data-valmsg-for="Password" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12 col-md-6">
+                            <label class="form-label" for="User_ConfirmPassword">Confirm password</label>
+                            <input name="ConfirmPassword" class="form-control" id="User_ConfirmPassword" autocomplete="new-password" />
+                            <span data-valmsg-for="ConfirmPassword" class="text-danger small"></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        const modal = new bootstrap.Modal(document.getElementById('userModal'));
+        const setAddDefaults = () => {
+            document.getElementById('User_Id').value = '';
+            document.getElementById('User_Email').value = '';
+            document.getElementById('User_PhoneNumber').value = '';
+            document.getElementById('User_EmailConfirmed').checked = true;
+            document.getElementById('User_Password').value = '';
+            document.getElementById('User_ConfirmPassword').value = '';
+        };
+
+        document.getElementById('addUserBtn').addEventListener('click', () => {
+            document.getElementById('userModalTitle').textContent = 'Add user';
+            setAddDefaults();
+            document.querySelectorAll('[data-valmsg-for]').forEach(x => x.textContent = '');
+            modal.show();
+        });
+        document.querySelectorAll('[data-edit-user]').forEach(button => {
+            button.addEventListener('click', async () => {
+                const response = await fetch(`/Admin/UsersManagement/GetById/${button.getAttribute('data-user-id')}`);
+                if (!response.ok) return;
+                const data = await response.json();
+                document.getElementById('userModalTitle').textContent = 'Edit user';
+                document.getElementById('User_Id').value = data.id;
+                document.getElementById('User_Email').value = data.email ?? '';
+                document.getElementById('User_PhoneNumber').value = data.phoneNumber ?? '';
+                document.getElementById('User_EmailConfirmed').checked = !!data.emailConfirmed;
+                document.getElementById('User_Password').value = '';
+                document.getElementById('User_ConfirmPassword').value = '';
+                document.querySelectorAll('[data-valmsg-for]').forEach(x => x.textContent = '');
+                modal.show();
+            });
+        });
+    </script>
+}

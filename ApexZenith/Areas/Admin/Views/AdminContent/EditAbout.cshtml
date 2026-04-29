@@ -1,0 +1,16 @@
+@model ApexZenith.Models.About
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit About";
+}
+<form asp-action="EditAbout" method="post" class="container">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3"><label class="form-label">Title</label><input asp-for="Title" class="form-control" /><span asp-validation-for="Title" class="text-danger small"></span></div>
+    <div class="mb-3"><label class="form-label">Content</label><textarea asp-for="Content" class="form-control" rows="5"></textarea><span asp-validation-for="Content" class="text-danger small"></span></div>
+    <div class="mb-3"><label class="form-label">Photo Url</label><input asp-for="PhotoUrl" class="form-control" /><span asp-validation-for="PhotoUrl" class="text-danger small"></span></div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Update</button>
+        <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

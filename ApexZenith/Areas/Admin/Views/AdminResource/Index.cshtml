@@ -1,0 +1,103 @@
+@model IReadOnlyList<ApexZenith.Areas.Admin.Models.Resource>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Navigation resources";
+}
+@if (TempData["StatusMessage"] is string msg)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @msg
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+@if (TempData["ErrorMessage"] is string err)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        @err
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <p class="text-secondary mb-0 small">These rows power the left sidebar. Changes apply on the next request.</p>
+    <div class="d-flex gap-2 flex-wrap">
+        <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-secondary btn-sm">Website content</a>
+        <a asp-area="Admin" asp-controller="AdminManage" asp-action="SystemSettings" asp-route-tab="resources" class="btn btn-outline-secondary btn-sm">System map</a>
+        <a asp-action="Create" class="btn btn-primary btn-sm">Add item</a>
+    </div>
+</div>
+<div class="card admin-table-card">
+    <div class="card-body table-responsive p-0">
+        <table class="table table-hover align-middle mb-0 small">
+            <thead class="table-light">
+                <tr>
+                    <th>Id</th>
+                    <th>Parent</th>
+                    <th>Title</th>
+                    <th>Route</th>
+                    <th>Type</th>
+                    <th>Tab</th>
+                    <th>Order</th>
+                    <th>Active</th>
+                    <th>Allowed roles</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var row in Model)
+                {
+                    <tr>
+                        <td class="font-monospace">@row.Id</td>
+                        <td>@(row.ParentId?.ToString() ?? "—")</td>
+                        <td>@row.Name</td>
+                        <td>
+                            <code class="small">@row.Area / @(row.Controller ?? "—") / @(row.Action ?? "—")</code>
+                        </td>
+                        <td>
+                            @if (!row.IsAction && !string.IsNullOrWhiteSpace(row.SettingsTabId))
+                            {
+                                <span class="badge text-bg-info">tab</span>
+                            }
+                            else if (row.IsAction)
+                            {
+                                <span class="badge text-bg-primary">action</span>
+                            }
+                            else if (row.Children.Count > 0)
+                            {
+                                <span class="badge text-bg-secondary">group</span>
+                            }
+                            else
+                            {
+                                <span class="badge text-bg-light border">section</span>
+                            }
+                        </td>
+                        <td class="font-monospace">@(string.IsNullOrWhiteSpace(row.SettingsTabId) ? "—" : row.SettingsTabId)</td>
+                        <td class="font-monospace">@row.Order</td>
+                        <td>@(row.IsActive ? "Yes" : "No")</td>
+                        <td>
+                            @{
+                                var rowRoles = row.RoleRules.Select(x => x.RoleId).Where(role => !string.IsNullOrWhiteSpace(role)).Distinct().ToList();
+                            }
+                            @if (rowRoles.Count > 0)
+                            {
+                                foreach (var role in rowRoles)
+                                {
+                                    <span class="badge text-bg-light border me-1">@role</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-secondary">All authenticated users</span>
+                            }
+                        </td>
+                        <td class="text-end">
+                            <div class="btn-group btn-group-sm">
+                                <a asp-action="Edit" asp-route-id="@row.Id" class="btn btn-outline-primary">Edit</a>
+                                <a asp-action="Delete" asp-route-id="@row.Id" class="btn btn-outline-danger">Delete</a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,109 @@
+﻿@model ApexZenith.Models.Contact
+@{
+
+    // Random rand = new Random();
+    // int count = rand.Next(1, 5);
+
+}
+
+<!-- Page Title -->
+<div class="page-title accent-background">
+    <div class="container d-lg-flex justify-content-between align-items-center">
+        <h1 class="mb-2 mb-lg-0">Team</h1>
+        <nav class="breadcrumbs">
+            <ol>
+                <li><a asp-controller="Home" asp-action="Index">Home</a></li>
+                <li class="current">Team</li>
+            </ol>
+        </nav>
+    </div>
+</div><!-- End Page Title -->
+<!-- Team Section -->
+<section id="team" class="team section">
+    <p>@Model.Id</p>
+    <div class="container">
+
+        @*   <div class="alert @(count == 1 ? "alert-primary" : count == 2 ? "alert-warning" : "alert-success")">           
+            "Success alert!" count:@count
+        </div> *@
+        @* @if (Model.Contact.Id == 1)
+        {
+            <div class="alert alert-success">
+                Feedback submitted successfully!
+            </div>
+        }
+        else if (Model.Contact.Id == 2)
+        {
+            <div class="alert alert-danger">
+                Failed to submit feedback. Please try again.
+            </div>
+        }
+        else
+        {
+
+            <div class="alert alert-info">
+                No feedback submitted.
+            </div>
+        } *@
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Full Name</th>
+                    <th scope="col">Email Address</th>
+                    <th scope="col">Subject</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <th scope="row">1</th>
+                    <td>@Model.FullName</td>
+                    <td>@Model.Email</td>
+                    <td>@Model.Subject</td>
+                    <td>
+
+                        <!-- Button trigger modal -->
+                        <button type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#exampleModal">
+                            View
+                        </button>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h1 class="modal-title fs-5" id="exampleModalLabel">@Model.FullName Feedback</h1>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Full Name:</p> @Model.FullName
+                                        <p>Email Address:</p> @Model.Email
+                                        <p>Subject:</p> @Model.Subject
+                                        <p>Message:</p> @Model.Message
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                                        <button type="button" class="btn btn-primary">Print feedback</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+
+                    </td>
+                </tr>
+
+            </tbody>
+        </table>
+
+    </div>
+
+</section><!-- /Team Section -->
+@section Scripts {
+    <script>
+        console.log("Page-specific JS here");
+    </script>
+}

@@ -1,0 +1,13 @@
+@model ApexZenith.Models.News
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Delete News";
+}
+<form asp-action="DeleteNews" method="post" class="container">
+    <input type="hidden" asp-for="Id" />
+    <p class="alert alert-warning mb-3">Delete <strong>@Model.Headline</strong>?</p>
+    <div class="d-flex gap-2">
+        <button class="btn btn-danger" type="submit">Delete</button>
+        <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

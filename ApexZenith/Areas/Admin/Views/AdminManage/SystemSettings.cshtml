@@ -1,0 +1,104 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "System map";
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-5">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="mb-2">System map</h5>
+                <p class="text-secondary mb-0">
+                    This page is a navigation guide for new or junior developers.
+                    It explains where the major admin areas live and which files to edit for common changes.
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-7">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex flex-wrap gap-2">
+                    <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="btn btn-primary">Dashboard</a>
+                    <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-primary">Website content</a>
+                    <a asp-area="Admin" asp-controller="UsersManagement" asp-action="Index" class="btn btn-outline-primary">Users</a>
+                    <a asp-area="Admin" asp-controller="RolesManagement" asp-action="Index" class="btn btn-outline-primary">Roles</a>
+                    <a asp-area="Admin" asp-controller="RoleAssignments" asp-action="Index" class="btn btn-outline-primary">Role assignments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="card-title mb-0">Admin areas</h3>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm align-middle mb-0">
+                        <thead>
+                            <tr>
+                                <th>Area</th>
+                                <th>Controller</th>
+                                <th>Purpose</th>
+                            </tr>
+                        </thead>
+                        <tbody class="small">
+                            <tr>
+                                <td>Admin</td>
+                                <td>Admin</td>
+                                <td>Main dashboard and summary counters.</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>AdminContent</td>
+                                <td>CRUD for website content and news.</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>UsersManagement</td>
+                                <td>Create, edit, and delete users.</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>RolesManagement</td>
+                                <td>Create and delete roles.</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>RoleAssignments</td>
+                                <td>Add or remove roles from users.</td>
+                            </tr>
+                            <tr>
+                                <td>Admin</td>
+                                <td>AdminResource</td>
+                                <td>Admin sidebar/menu configuration.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12 col-xl-6">
+        <div class="card h-100">
+            <div class="card-header">
+                <h3 class="card-title mb-0">Where to edit things</h3>
+            </div>
+            <div class="card-body">
+                <ul class="mb-0 text-secondary">
+                    <li><strong>Dashboard counts:</strong> [AdminController.cs]</li>
+                    <li><strong>Menu labels and order:</strong> [SeedData.AdminMenu.cs]</li>
+                    <li><strong>Admin sidebar rendering:</strong> [_AdminSidebar.cshtml]</li>
+                    <li><strong>User management:</strong> UsersManagement controller and view</li>
+                    <li><strong>Role management:</strong> RolesManagement controller and view</li>
+                    <li><strong>Role assignments:</strong> RoleAssignments controller and view</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

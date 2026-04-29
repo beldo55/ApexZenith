@@ -1,0 +1,91 @@
+@model IReadOnlyList<ApexZenith.Models.Address>
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Address content";
+}
+<partial name="_ContentNavigation" model="@("Addresses")" />
+<partial name="_ContentTableStyles" />
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-3">
+    <p class="text-secondary mb-0">Manage office locations and contact details.</p>
+    <a asp-action="CreateAddress" asp-route-returnTo="Addresses" class="btn btn-primary btn-sm">Add Address</a>
+</div>
+
+<div class="card admin-table-card">
+    <div class="card-body table-responsive p-0">
+        <table class="table table-striped table-hover content-table mb-0">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Head Office</th>
+                    <th>Location</th>
+                    <th>Email</th>
+                    <th>Phone</th>
+                    <th>Map</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model.Count == 0)
+                {
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-secondary">No address entries found.</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        var modalId = $"delete-address-{item.Id}";
+                        <tr>
+                            <td>@item.Id</td>
+                            <td><span class="badge text-bg-light border">@item.IsHeadOffice</span></td>
+                            <td>@item.Location</td>
+                            <td>@item.Email</td>
+                            <td>@item.Phone</td>
+                            <td>
+                                @if (!string.IsNullOrWhiteSpace(item.GoogleMapUrl))
+                                {
+                                    <a href="@item.GoogleMapUrl" target="_blank" rel="noopener noreferrer" class="btn btn-outline-secondary btn-sm">Open map</a>
+                                }
+                                else
+                                {
+                                    <span class="text-secondary small">—</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <div class="btn-group btn-group-sm">
+                                    <a asp-action="EditAddress" asp-route-id="@item.Id" asp-route-returnTo="Addresses" class="btn btn-outline-primary">Edit</a>
+                                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#@modalId">Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+
+                        <div class="modal fade" id="@modalId" tabindex="-1" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Delete address</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Delete address for <strong>@item.Location</strong>?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <form asp-action="DeleteAddress" method="post" class="d-inline">
+                                            @Html.AntiForgeryToken()
+                                            <input type="hidden" name="id" value="@item.Id" />
+                                            <input type="hidden" name="returnTo" value="Addresses" />
+                                            <button type="submit" class="btn btn-danger">Delete</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

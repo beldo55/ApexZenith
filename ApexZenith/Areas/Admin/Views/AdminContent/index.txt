@@ -1,0 +1,321 @@
+﻿@model maincompany.Controllers.AdminContentIndexViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Content Management";
+}
+
+<div class="row g-3">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">About</h3>
+                    <a asp-action="CreateAbout" class="btn btn-primary btn-sm">Add About</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Title</th>
+                            <th>Photo</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.About)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Title</td>
+                                <td class="text-truncate" style="max-width: 320px;">@item.PhotoUrl</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditAbout" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteAbout" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">Address</h3>
+                    <a asp-action="CreateAddress" class="btn btn-primary btn-sm">Add Address</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Location</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Address)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Location</td>
+                                <td>@item.Email</td>
+                                <td>@item.Phone</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditAddress" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteAddress" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">Services</h3>
+                    <a asp-action="CreateService" class="btn btn-primary btn-sm">Add Service</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Name</th>
+                            <th>Description</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Services)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.Contents</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditService" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteService" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">News</h3>
+                    <a asp-action="CreateNews" class="btn btn-primary btn-sm">Add News</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Headline</th>
+                            <th>Category</th>
+                            <th>Published</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.News)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Headline</td>
+                                <td>@item.PostedBy</td>
+                                <td>@item.DisplayDate</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditNews" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteNews" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">Clients</h3>
+                    <a asp-action="CreateClient" class="btn btn-primary btn-sm">Add Client</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Name</th>
+                            <th>Website</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Clients)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.Website</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditClient" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteClient" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">Team</h3>
+                    <a asp-action="CreateTeam" class="btn btn-primary btn-sm">Add Member</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Team)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.Position</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditTeam" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteTeam" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">Testimonials</h3>
+                    <a asp-action="CreateTestimonial" class="btn btn-primary btn-sm">Add Testimonial</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Name</th>
+                            <th>Position</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Testimonials)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>@item.Position</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditTestimonial" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteTestimonial" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+                    <h3 class="card-title mb-0">News Categories</h3>
+                    <a asp-action="CreateCategory" class="btn btn-primary btn-sm">Add Category</a>
+                </div>
+            </div>
+            <div class="card-body table-responsive p-0">
+                <table class="table table-bordered table-striped table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th style="width: 80px;">ID</th>
+                            <th>Name</th>
+                            <th style="width: 180px;">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Categories)
+                        {
+                            <tr>
+                                <td>@item.Id</td>
+                                <td>@item.Name</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <a asp-action="EditCategory" asp-route-id="@item.Id" class="btn btn-outline-primary">Edit</a>
+                                        <a asp-action="DeleteCategory" asp-route-id="@item.Id" class="btn btn-outline-danger">Delete</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

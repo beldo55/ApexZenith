@@ -1,0 +1,353 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MainCompany Admin</title>
+    <meta name="color-scheme" content="light dark" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@@fontsource/source-sans-3@@5.0.12/index.css" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/adminlte/adminlte.min.css" asp-append-version="true" />
+    <style>
+        .admin-table-tools {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--bs-border-color);
+            background: var(--bs-body-bg);
+        }
+
+        .admin-table-search {
+            position: relative;
+            flex: 1 1 320px;
+            max-width: 440px;
+        }
+
+        .admin-table-search i {
+            position: absolute;
+            top: 50%;
+            left: 12px;
+            color: var(--bs-secondary-color);
+            transform: translateY(-50%);
+            pointer-events: none;
+        }
+
+        .admin-table-search input {
+            padding-left: 38px;
+        }
+
+        .admin-table-length {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--bs-secondary-color);
+            font-size: 0.875rem;
+            white-space: nowrap;
+        }
+
+        .admin-table-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 12px 16px;
+            border-top: 1px solid var(--bs-border-color);
+            background: var(--bs-body-bg);
+        }
+
+        .admin-table-info {
+            color: var(--bs-secondary-color);
+            font-size: 0.875rem;
+        }
+
+        .admin-table-pagination {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            margin: 0;
+        }
+
+        .admin-table-pagination .page-link {
+            min-width: 34px;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .admin-table-empty-row td {
+            padding: 24px 16px;
+            color: var(--bs-secondary-color);
+            text-align: center;
+        }
+
+        @@media (max-width: 767.98px) {
+            .admin-table-tools,
+            .admin-table-footer {
+                align-items: stretch;
+                flex-direction: column;
+            }
+
+            .admin-table-search {
+                max-width: none;
+            }
+
+            .admin-table-pagination {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
+    <div class="app-wrapper">
+        <nav class="app-header navbar navbar-expand bg-body">
+            <div class="container-fluid">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" data-lte-toggle="sidebar" href="#" role="button">
+                            <i class="bi bi-list"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a asp-controller="Home" asp-action="Index" class="nav-link">Website</a>
+                    </li>
+                    <li class="nav-item d-none d-md-block">
+                        <a asp-controller="Admin" asp-action="Index" class="nav-link">Dashboard</a>
+                    </li>
+                </ul>
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-lte-toggle="fullscreen">
+                            <i data-lte-icon="maximize" class="bi bi-arrows-fullscreen"></i>
+                            <i data-lte-icon="minimize" class="bi bi-fullscreen-exit" style="display:none"></i>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+
+        <aside class="app-sidebar bg-body-secondary shadow" data-bs-theme="dark">
+            <div class="sidebar-brand">
+                <a asp-controller="Admin" asp-action="Index" class="brand-link">
+                    <span class="brand-text fw-light">⚔️ApexZenith</span>
+                </a>
+            </div>
+            <div class="sidebar-wrapper">
+                <nav class="mt-2">
+                    @await Html.PartialAsync("_AdminSidebar")
+                </nav>
+            </div>
+        </aside>
+
+        <main class="app-main">
+            <div class="app-content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h3 class="mb-0">@ViewData["Title"]</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="container-fluid">
+                    @RenderBody()
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/adminlte/js/adminlte.js" asp-append-version="true"></script>
+    <script>
+        (() => {
+            const pageSizes = [5, 10, 25, 50];
+
+            const getCellText = (row) => Array.from(row.cells)
+                .map((cell) => cell.innerText.trim())
+                .join(" ")
+                .toLowerCase();
+
+            const makeButton = (label, disabled, active, onClick, ariaLabel) => {
+                const item = document.createElement("li");
+                item.className = `page-item${disabled ? " disabled" : ""}${active ? " active" : ""}`;
+
+                const button = document.createElement("button");
+                button.type = "button";
+                button.className = "page-link";
+                button.textContent = label;
+                button.disabled = disabled;
+                button.setAttribute("aria-label", ariaLabel || label);
+                button.addEventListener("click", onClick);
+
+                item.appendChild(button);
+                return item;
+            };
+
+            const buildPageRange = (currentPage, totalPages) => {
+                if (totalPages <= 7) {
+                    return Array.from({ length: totalPages }, (_, index) => index + 1);
+                }
+
+                const pages = new Set([1, totalPages, currentPage, currentPage - 1, currentPage + 1]);
+                if (currentPage <= 3) {
+                    pages.add(2);
+                    pages.add(3);
+                    pages.add(4);
+                }
+                if (currentPage >= totalPages - 2) {
+                    pages.add(totalPages - 1);
+                    pages.add(totalPages - 2);
+                    pages.add(totalPages - 3);
+                }
+
+                return Array.from(pages)
+                    .filter((page) => page >= 1 && page <= totalPages)
+                    .sort((a, b) => a - b);
+            };
+
+            const enhanceTable = (table, tableIndex) => {
+                if (table.dataset.adminTable === "false" || table.dataset.adminTableEnhanced === "true") {
+                    return;
+                }
+
+                const tbody = table.tBodies[0];
+                if (!tbody) {
+                    return;
+                }
+
+                const allRows = Array.from(tbody.rows);
+                const placeholderRows = allRows.filter((row) => row.cells.length === 1 && row.cells[0].hasAttribute("colspan"));
+                const rows = allRows.filter((row) => !placeholderRows.includes(row));
+
+                table.dataset.adminTableEnhanced = "true";
+                placeholderRows.forEach((row) => {
+                    row.hidden = true;
+                });
+
+                const columnCount = table.tHead?.rows[0]?.cells.length || rows[0]?.cells.length || 1;
+                let searchTerm = "";
+                let pageSize = 10;
+                let currentPage = 1;
+
+                const wrapper = table.closest(".table-responsive") || table.parentElement;
+                const host = wrapper?.parentElement || table.parentElement;
+                const title = table.closest(".card")?.querySelector(".card-title, h5")?.textContent?.trim() || "table";
+
+                const tools = document.createElement("div");
+                tools.className = "admin-table-tools";
+                tools.innerHTML = `
+                    <label class="admin-table-search" for="admin-table-search-${tableIndex}">
+                        <i class="bi bi-search"></i>
+                        <input id="admin-table-search-${tableIndex}" type="search" class="form-control form-control-sm" placeholder="Search ${title}" autocomplete="off">
+                    </label>
+                    <label class="admin-table-length">
+                        <span>Rows</span>
+                        <select class="form-select form-select-sm" aria-label="Rows per page">
+                            ${pageSizes.map((size) => `<option value="${size}"${size === pageSize ? " selected" : ""}>${size}</option>`).join("")}
+                        </select>
+                    </label>`;
+
+                const footer = document.createElement("div");
+                footer.className = "admin-table-footer";
+                footer.innerHTML = `
+                    <div class="admin-table-info" aria-live="polite"></div>
+                    <nav aria-label="Table pagination">
+                        <ul class="pagination pagination-sm admin-table-pagination"></ul>
+                    </nav>`;
+
+                const searchInput = tools.querySelector("input");
+                const pageSizeSelect = tools.querySelector("select");
+                const info = footer.querySelector(".admin-table-info");
+                const pager = footer.querySelector(".admin-table-pagination");
+
+                const emptyRow = document.createElement("tr");
+                emptyRow.className = "admin-table-empty-row";
+                emptyRow.hidden = true;
+                emptyRow.innerHTML = `<td colspan="${columnCount}">No matching records found.</td>`;
+                tbody.appendChild(emptyRow);
+
+                const render = () => {
+                    const filteredRows = rows.filter((row) => getCellText(row).includes(searchTerm));
+                    const totalRows = filteredRows.length;
+                    const totalPages = Math.max(1, Math.ceil(totalRows / pageSize));
+                    currentPage = Math.min(currentPage, totalPages);
+
+                    const startIndex = (currentPage - 1) * pageSize;
+                    const endIndex = startIndex + pageSize;
+                    const visibleRows = new Set(filteredRows.slice(startIndex, endIndex));
+
+                    rows.forEach((row) => {
+                        row.hidden = !visibleRows.has(row);
+                    });
+
+                    emptyRow.hidden = totalRows !== 0;
+
+                    const from = totalRows === 0 ? 0 : startIndex + 1;
+                    const to = Math.min(endIndex, totalRows);
+                    info.textContent = `Showing ${from}-${to} of ${totalRows} row${totalRows === 1 ? "" : "s"}`;
+
+                    pager.innerHTML = "";
+                    pager.appendChild(makeButton("Prev", currentPage === 1, false, () => {
+                        currentPage -= 1;
+                        render();
+                    }, "Previous page"));
+
+                    let previousPage = 0;
+                    buildPageRange(currentPage, totalPages).forEach((page) => {
+                        if (previousPage && page - previousPage > 1) {
+                            const gap = document.createElement("li");
+                            gap.className = "page-item disabled";
+                            gap.innerHTML = '<span class="page-link">...</span>';
+                            pager.appendChild(gap);
+                        }
+
+                        pager.appendChild(makeButton(String(page), false, page === currentPage, () => {
+                            currentPage = page;
+                            render();
+                        }, `Page ${page}`));
+                        previousPage = page;
+                    });
+
+                    pager.appendChild(makeButton("Next", currentPage === totalPages, false, () => {
+                        currentPage += 1;
+                        render();
+                    }, "Next page"));
+                };
+
+                searchInput.addEventListener("input", (event) => {
+                    searchTerm = event.target.value.trim().toLowerCase();
+                    currentPage = 1;
+                    render();
+                });
+
+                pageSizeSelect.addEventListener("change", (event) => {
+                    pageSize = Number(event.target.value);
+                    currentPage = 1;
+                    render();
+                });
+
+                if (host && wrapper) {
+                    host.insertBefore(tools, wrapper);
+                    wrapper.insertAdjacentElement("afterend", footer);
+                } else {
+                    table.insertAdjacentElement("beforebegin", tools);
+                    table.insertAdjacentElement("afterend", footer);
+                }
+
+                render();
+            };
+
+            document.addEventListener("DOMContentLoaded", () => {
+                document.querySelectorAll(".app-main table").forEach(enhanceTable);
+            });
+        })();
+    </script>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

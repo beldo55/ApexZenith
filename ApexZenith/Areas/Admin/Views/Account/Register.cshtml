@@ -1,0 +1,58 @@
+@model ApexZenith.Areas.Admin.Models.RegisterStaffViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminAuthLayout.cshtml";
+    ViewData["Title"] = ViewData["Title"] ?? "Create account";
+}
+<div class="auth-heading">
+    <div class="eyebrow">Get started</div>
+    <h2>Create your account</h2>
+    <p>Set up secure access for your ApexZenith account.</p>
+</div>
+
+@if (TempData["StatusMessage"] is string ok)
+{
+    <div class="alert alert-success small py-2">@ok</div>
+}
+<form asp-area="Admin" asp-controller="Account" asp-action="Register" method="post" class="needs-validation" novalidate>
+    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small" role="alert"></div>
+    <div class="mb-3">
+        <label asp-for="Email" class="form-label"></label>
+        <input asp-for="Email" class="form-control" autocomplete="off" />
+        <span asp-validation-for="Email" class="text-danger small"></span>
+    </div>
+    <div class="mb-3">
+        <label asp-for="Password" class="form-label"></label>
+        <input asp-for="Password" class="form-control" autocomplete="new-password" />
+        <span asp-validation-for="Password" class="text-danger small"></span>
+        <div class="form-text">Minimum 12 characters with upper, lower, digit, and symbol.</div>
+    </div>
+    <div class="mb-3">
+        <label asp-for="ConfirmPassword" class="form-label"></label>
+        <input asp-for="ConfirmPassword" class="form-control" autocomplete="new-password" />
+        <span asp-validation-for="ConfirmPassword" class="text-danger small"></span>
+    </div>
+    @* <div class="mb-4">
+        <label asp-for="RoleName" class="form-label"></label>
+        <select asp-for="RoleName" class="form-select">
+            <option value="User">User (content editors)</option>
+            <option value="Admin">Admin (full control)</option>
+        </select>
+    </div> *@
+    <button type="submit" class="btn btn-primary w-100">
+        <i class="bi bi-person-plus me-2"></i>
+        Create account
+    </button>
+    <div class="d-flex flex-column flex-sm-row align-items-center justify-content-between gap-2 mt-4 small">
+        <a asp-area="" asp-controller="Home" asp-action="Index" class="auth-footer-link">
+            <i class="bi bi-house-door me-1"></i>
+            Back to home
+        </a>
+        <span class="text-muted">
+            Already have access?
+            <a asp-area="Admin" asp-controller="Account" asp-action="Login" class="auth-footer-link">Sign in</a>
+        </span>
+    </div>
+</form>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

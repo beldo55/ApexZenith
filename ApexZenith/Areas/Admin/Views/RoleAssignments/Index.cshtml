@@ -1,0 +1,93 @@
+@model ApexZenith.Areas.Admin.Models.RoleAssignmentIndexViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Role assignments";
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-12 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="mb-2">Assignments</h5>
+                <div class="text-secondary">Add or remove role membership for users.</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-8">
+        <div class="card h-100">
+            <div class="card-body">
+                <h5 class="mb-1">Role mapping</h5>
+                <div class="text-secondary small">@Model.Users.Count user(s) mapped to @Model.Roles.Count role(s)</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (TempData["StatusMessage"] is string statusMessage)
+{
+    <div class="alert alert-success">@statusMessage</div>
+}
+@if (TempData["ErrorMessage"] is string errorMessage)
+{
+    <div class="alert alert-danger">@errorMessage</div>
+}
+
+<div class="card admin-table-card">
+    <div class="card-body p-0 table-responsive">
+        <table class="table table-striped align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>User</th>
+                    <th>Current roles</th>
+                    <th>Add role</th>
+                    <th class="text-end">Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var user in Model.Users)
+            {
+                <tr>
+                    <td class="fw-semibold">@user.Email</td>
+                    <td>
+                        @if (user.Roles.Count == 0)
+                        {
+                            <span class="text-secondary">No roles</span>
+                        }
+                        else
+                        {
+                            foreach (var role in user.Roles)
+                            {
+                                <span class="badge text-bg-light border me-1">@role</span>
+                            }
+                        }
+                    </td>
+                    <td>
+                        <form asp-action="Add" method="post" class="d-flex gap-2">
+                            @Html.AntiForgeryToken()
+                            <input type="hidden" name="userId" value="@user.Id" />
+                            <select name="roleName" class="form-select form-select-sm">
+                                @foreach (var roleName in Model.Roles)
+                                {
+                                    <option value="@roleName">@roleName</option>
+                                }
+                            </select>
+                            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+                        </form>
+                    </td>
+                    <td class="text-end">
+                        @foreach (var role in user.Roles)
+                        {
+                            <form asp-action="Remove" method="post" class="d-inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="userId" value="@user.Id" />
+                                <input type="hidden" name="roleName" value="@role" />
+                                <button type="submit" class="btn btn-outline-secondary btn-sm me-1 mb-1">Remove @role</button>
+                            </form>
+                        }
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</div>

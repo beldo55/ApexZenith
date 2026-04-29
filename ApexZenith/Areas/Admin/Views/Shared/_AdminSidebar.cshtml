@@ -1,0 +1,131 @@
+@using ApexZenith.Areas.Admin.Models
+@using ApexZenith.Data
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
+@inject ApplicationDbContext Db
+@inject UserManager<IdentityUser> UserManager
+@{
+    var currentArea = ViewContext.RouteData.Values["area"]?.ToString() ?? string.Empty;
+    var currentController = ViewContext.RouteData.Values["controller"]?.ToString() ?? string.Empty;
+    var currentAction = ViewContext.RouteData.Values["action"]?.ToString() ?? string.Empty;
+    var currentTab = Context.Request.Query["tab"].FirstOrDefault() ?? string.Empty;
+
+    var user = await UserManager.GetUserAsync(User);
+    var userRoles = user is null
+        ? new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+        : new HashSet<string>(await UserManager.GetRolesAsync(user), StringComparer.OrdinalIgnoreCase);
+
+    var roleIds = await Db.ResourceRoles
+        .AsNoTracking()
+        .Where(x => userRoles.Contains(x.RoleId))
+        .Select(x => x.ResourceId)
+        .Distinct()
+        .ToListAsync();
+
+    var items = await Db.Resource
+        .AsNoTracking()
+        .Where(x => x.IsActive)
+        .Where(x => !Db.ResourceRoles.Any(rr => rr.ResourceId == x.Id) || roleIds.Contains(x.Id))
+        .OrderBy(x => x.ParentId == null ? 0 : 1)
+        .ThenBy(x => x.ParentId)
+        .ThenBy(x => x.Order)
+        .ThenBy(x => x.Name)
+        .ToListAsync();
+
+    var parents = items.Where(x => x.ParentId is null).ToList();
+    Func<Resource, bool> isActive = item =>
+    {
+        var routeMatch =
+            item.IsAction &&
+            string.Equals(currentArea, item.Area, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(currentController, item.Controller, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(currentAction, item.Action, StringComparison.OrdinalIgnoreCase);
+
+        var tabMatch =
+            !string.IsNullOrWhiteSpace(item.SettingsTabId) &&
+            string.Equals(currentArea, item.Area, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(currentController, item.Controller, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(currentAction, item.Action, StringComparison.OrdinalIgnoreCase) &&
+            string.Equals(currentTab, item.SettingsTabId, StringComparison.OrdinalIgnoreCase);
+
+        return routeMatch || tabMatch;
+    };
+}
+
+<ul class="nav sidebar-menu flex-column" data-lte-toggle="treeview" role="menu">
+    @foreach (var item in parents)
+    {
+        var children = items.Where(x => x.ParentId == item.Id).OrderBy(x => x.Order).ThenBy(x => x.Name).ToList();
+        var hasRoute = item.IsAction && !string.IsNullOrWhiteSpace(item.Action) && !string.IsNullOrWhiteSpace(item.Controller);
+        var hasTab = !string.IsNullOrWhiteSpace(item.SettingsTabId) && !string.IsNullOrWhiteSpace(item.Controller) && !string.IsNullOrWhiteSpace(item.Action);
+        var isGroup = children.Count > 0 && !hasRoute && !hasTab;
+        var active = isActive(item) || children.Any(isActive);
+
+        <li class="nav-item @(children.Count > 0 ? "menu-open" : "")">
+            @if (isGroup)
+            {
+                <a href="#" class="nav-link @(active ? "active" : "")">
+                    <i class="nav-icon @(string.IsNullOrWhiteSpace(item.IconClass) ? "bi bi-folder" : item.IconClass)"></i>
+                    <p>
+                        @item.Name
+                        <i class="nav-arrow bi bi-chevron-right"></i>
+                    </p>
+                </a>
+            }
+            else if (hasRoute)
+            {
+                <a asp-area="@item.Area" asp-controller="@item.Controller" asp-action="@item.Action" asp-route-tab="@(hasTab ? item.SettingsTabId : null)" class="nav-link @(active ? "active" : "")">
+                    <i class="nav-icon @(string.IsNullOrWhiteSpace(item.IconClass) ? "" : item.IconClass)"></i>
+                    <p>@item.Name</p>
+                </a>
+            }
+            else if (hasTab)
+            {
+                <a asp-area="@item.Area" asp-controller="@item.Controller" asp-action="@item.Action" asp-route-tab="@item.SettingsTabId" class="nav-link @(active ? "active" : "")">
+                    <i class="nav-icon @(string.IsNullOrWhiteSpace(item.IconClass) ? null : item.IconClass)"></i>
+                    <p>@item.Name</p>
+                </a>
+            }
+            else
+            {
+                <div class="nav-link text-body-secondary">
+                    <i class="nav-icon @(string.IsNullOrWhiteSpace(item.IconClass) ? "" : item.IconClass)"></i>
+                    <p>@item.Name</p>
+                </div>
+            }
+
+            @if (children.Count > 0)
+            {
+                <ul class="nav nav-treeview">
+                    @foreach (var child in children)
+                    {
+                        var childActive = isActive(child);
+                        <li class="nav-item">
+                            @if (child.IsAction && !string.IsNullOrWhiteSpace(child.Controller) && !string.IsNullOrWhiteSpace(child.Action))
+                            {
+                                <a asp-area="@child.Area" asp-controller="@child.Controller" asp-action="@child.Action" asp-route-tab="@child.SettingsTabId" class="nav-link @(childActive ? "active" : "")">
+                                    <i class="nav-icon @(string.IsNullOrWhiteSpace(child.IconClass) ? "" : child.IconClass)"></i>
+                                    <p>@child.Name</p>
+                                </a>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(child.Controller) && !string.IsNullOrWhiteSpace(child.Action) && !string.IsNullOrWhiteSpace(child.SettingsTabId))
+                            {
+                                <a asp-area="@child.Area" asp-controller="@child.Controller" asp-action="@child.Action" asp-route-tab="@child.SettingsTabId" class="nav-link @(childActive ? "active" : "")">
+                                    <i class="nav-icon @(string.IsNullOrWhiteSpace(child.IconClass) ? "" : child.IconClass)"></i>
+                                    <p>@child.Name</p>
+                                </a>
+                            }
+                            else
+                            {
+                                <div class="nav-link text-body-secondary">
+                                    <i class="nav-icon @(string.IsNullOrWhiteSpace(child.IconClass) ? "" : child.IconClass)"></i>
+                                    <p>@child.Name</p>
+                                </div>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+        </li>
+    }
+</ul>

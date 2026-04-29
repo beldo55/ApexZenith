@@ -1,0 +1,79 @@
+@model ApexZenith.Areas.Admin.Controllers.AdminManageIndexViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Site data overview";
+}
+
+<div class="d-flex flex-wrap gap-2 mb-3">
+    <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary btn-sm">Dashboard</a>
+    <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-primary btn-sm">Website content</a>
+    <a asp-area="Admin" asp-controller="AdminManage" asp-action="SystemSettings" asp-route-tab="resources" class="btn btn-outline-primary btn-sm">System map</a>
+    <a asp-area="Admin" asp-controller="AdminResource" asp-action="Index" class="btn btn-outline-primary btn-sm">Navigation resources</a>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">News</h3></div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Headline</th><th>Date</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in Model.News)
+                        {
+                            <tr><td>@item.Headline</td><td>@item.Date.ToString("dd MMM yyyy")</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Services</h3></div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Name</th><th>Description</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in Model.Services)
+                        {
+                            <tr><td>@item.Name</td><td>@item.Contents</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Team</h3></div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Name</th><th>Position</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in Model.Team)
+                        {
+                            <tr><td>@item.Name</td><td>@item.Position</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-12 col-lg-6">
+        <div class="card">
+            <div class="card-header"><h3 class="card-title">Contacts</h3></div>
+            <div class="card-body p-0 table-responsive">
+                <table class="table table-striped mb-0">
+                    <thead><tr><th>Name</th><th>Subject</th><th>Message</th></tr></thead>
+                    <tbody>
+                        @foreach (var item in Model.Contacts)
+                        {
+                            <tr><td>@item.FullName</td><td>@item.Subject</td><td>@item.Message</td></tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

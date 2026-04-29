@@ -1,0 +1,27 @@
+@model ApexZenith.Areas.Admin.Models.NewsFormModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Edit News";
+    var categories = ViewBag.CategoryOptions as IEnumerable<SelectListItem> ?? Enumerable.Empty<SelectListItem>();
+}
+<form asp-action="EditNews" method="post" class="container">
+    <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3"><label class="form-label">Headline</label><input asp-for="Headline" class="form-control" /><span asp-validation-for="Headline" class="text-danger small"></span></div>
+    <div class="mb-3"><label class="form-label">Content</label><textarea asp-for="Content" class="form-control" rows="5"></textarea><span asp-validation-for="Content" class="text-danger small"></span></div>
+    <div class="mb-3"><label class="form-label">Photo Url</label><input asp-for="PhotoUrl" class="form-control" /><span asp-validation-for="PhotoUrl" class="text-danger small"></span></div>
+    <div class="mb-3"><label class="form-label">Author</label><input asp-for="Author" class="form-control" /><span asp-validation-for="Author" class="text-danger small"></span></div>
+    <div class="mb-3">
+        <label class="form-label" asp-for="NewsCategoryId">Category</label>
+        <select asp-for="NewsCategoryId" asp-items="categories" class="form-select">
+            <option value="">Select category</option>
+        </select>
+        <span asp-validation-for="NewsCategoryId" class="text-danger small"></span>
+    </div>
+    <div class="mb-3"><label class="form-label">Date</label><input asp-for="Date" type="datetime-local" class="form-control" readonly /><span asp-validation-for="Date" class="text-danger small"></span></div>
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary" type="submit">Update</button>
+        <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+</form>

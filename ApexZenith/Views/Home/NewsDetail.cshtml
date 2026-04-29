@@ -1,0 +1,62 @@
+@model ApexZenith.Models.NewsPageViewModel
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8">
+            <section id="blog-details" class="blog-details section">
+                <div class="container">
+                    <article class="article">
+                        <div class="post-img">
+                            <img src="@Model.CurrentNews.PhotoUrl" class="img-fluid" alt="">
+                        </div>
+                        <h2 class="title">@Model.CurrentNews.Headline</h2>
+                        <div class="meta-top">
+                            <ul>
+                                <li class="d-flex align-items-center">
+                                    <i class="bi bi-person"></i>
+                                    <span>@Model.CurrentNews.Author</span>
+                                </li>
+                                <li class="d-flex align-items-center">
+                                    <i class="bi bi-clock"></i>
+                                    <time datetime="@Model.CurrentNews.Date.ToString("yyyy-MM-dd")">@Model.CurrentNews.Date.ToString("yyyy-MM-dd")</time>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="content">
+                            @Model.CurrentNews.Content
+                        </div>
+                        <div class="meta-bottom">
+                            <i class="bi bi-folder"></i>
+                            <ul class="cats">
+                            <li><a href="#">@Model.CurrentNews.Category</a></li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-4 sidebar">
+            <div class="widgets-container">
+                <div class="recent-posts-widget widget-item">
+                    <h3 class="widget-title">Recent Insights</h3>
+                    @foreach (var item in Model.AllNews.Where(b => b.Id != Model.CurrentNews.Id).Take(5))
+                    {
+                        <div class="post-item">
+                            <h4><a asp-action="NewsDetail" asp-route-id="@item.Id">@item.Headline</a></h4>
+                            <time datetime="@item.Date.ToString("yyyy-MM-dd")">@item.Date.ToString("yyyy-MM-dd")</time>
+                        </div>
+                    }
+                </div>
+                <div class="tags-widget widget-item">
+                    <h3 class="widget-title">Topics</h3>
+                    <ul>
+                        @foreach (var tag in Model.AllNews.SelectMany(b => b.Category).GroupBy(t => t.Name).Select(g => g.First()))
+                        {
+                            <li><a href="#">@tag.Name</a></li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

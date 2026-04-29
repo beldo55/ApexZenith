@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - ApexZenith</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap/css/bootstrap.min.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/assets/vendor/bootstrap-icons/bootstrap-icons.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/adminlte/adminlte.min.css" asp-append-version="true" />
+    <style>
+        :root {
+            --auth-ink: #111827;
+            --auth-muted: #667085;
+            --auth-line: #d9e2ef;
+            --auth-accent: #1bbd36;
+            --auth-accent-dark: #129427;
+            --auth-panel: rgba(255, 255, 255, 0.94);
+        }
+
+        body {
+            min-height: 100vh;
+            background:
+                linear-gradient(135deg, rgba(10, 15, 28, 0.92), rgba(17, 24, 39, 0.62)),
+                url("/assets/img/hero-carousel/hero-carousel-1.png") center/cover fixed;
+            color: var(--auth-ink);
+        }
+
+        .auth-shell {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 32px 0;
+        }
+
+        .auth-frame {
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.28);
+            border-radius: 8px;
+            background: var(--auth-panel);
+            box-shadow: 0 24px 70px rgba(4, 11, 24, 0.28);
+            backdrop-filter: blur(12px);
+        }
+
+        .auth-brand {
+            min-height: 100%;
+            padding: 42px;
+            color: #ffffff;
+            background:
+                linear-gradient(145deg, rgba(13, 20, 35, 0.95), rgba(14, 70, 34, 0.84)),
+                url("/assets/img/services.jpg") center/cover;
+        }
+
+        .auth-brand-mark {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            color: #ffffff;
+            font-weight: 800;
+            letter-spacing: 0;
+            text-transform: uppercase;
+        }
+
+        .auth-brand-mark i {
+            display: inline-flex;
+            width: 36px;
+            height: 36px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: var(--auth-accent);
+        }
+
+        .auth-brand h1 {
+            max-width: 430px;
+            margin: 72px 0 16px;
+            color: #ffffff;
+            font-size: clamp(2rem, 4vw, 3.4rem);
+            line-height: 1.04;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .auth-brand p {
+            max-width: 420px;
+            color: rgba(255, 255, 255, 0.78);
+            font-size: 1rem;
+        }
+
+        .auth-chip-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 42px;
+        }
+
+        .auth-chip {
+            border: 1px solid rgba(255, 255, 255, 0.22);
+            border-radius: 999px;
+            padding: 8px 12px;
+            color: rgba(255, 255, 255, 0.86);
+            background: rgba(255, 255, 255, 0.08);
+            font-size: 0.82rem;
+            font-weight: 700;
+        }
+
+        .auth-panel {
+            padding: 32px;
+        }
+
+        .auth-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 34px;
+        }
+
+        .auth-home-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--auth-muted);
+            font-weight: 700;
+            text-decoration: none;
+        }
+
+        .auth-home-link:hover {
+            color: var(--auth-accent-dark);
+        }
+
+        .auth-switch {
+            display: inline-flex;
+            gap: 4px;
+            padding: 4px;
+            border: 1px solid var(--auth-line);
+            border-radius: 8px;
+            background: #f8fafc;
+        }
+
+        .auth-switch a {
+            border-radius: 6px;
+            padding: 7px 12px;
+            color: var(--auth-muted);
+            font-size: 0.86rem;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .auth-switch a.active,
+        .auth-switch a:hover {
+            color: var(--auth-ink);
+            background: #ffffff;
+            box-shadow: 0 1px 6px rgba(16, 24, 40, 0.1);
+        }
+
+        .auth-heading {
+            margin-bottom: 24px;
+        }
+
+        .auth-heading .eyebrow {
+            margin-bottom: 8px;
+            color: var(--auth-accent-dark);
+            font-size: 0.78rem;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .auth-heading h2 {
+            margin: 0;
+            color: var(--auth-ink);
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 0;
+        }
+
+        .auth-heading p {
+            margin: 8px 0 0;
+            color: var(--auth-muted);
+        }
+
+        .auth-panel .form-label {
+            color: var(--auth-ink);
+            font-size: 0.9rem;
+            font-weight: 800;
+        }
+
+        .auth-panel .form-control {
+            min-height: 48px;
+            border-color: var(--auth-line);
+            border-radius: 8px;
+        }
+
+        .auth-panel .form-control:focus {
+            border-color: var(--auth-accent);
+            box-shadow: 0 0 0 0.2rem rgba(27, 189, 54, 0.14);
+        }
+
+        .auth-panel .btn-primary {
+            min-height: 48px;
+            border-color: var(--auth-accent);
+            border-radius: 8px;
+            background: var(--auth-accent);
+            font-weight: 800;
+        }
+
+        .auth-panel .btn-primary:hover,
+        .auth-panel .btn-primary:focus {
+            border-color: var(--auth-accent-dark);
+            background: var(--auth-accent-dark);
+        }
+
+        .auth-footer-link {
+            color: var(--auth-accent-dark);
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .auth-footer-link:hover {
+            color: var(--auth-ink);
+        }
+
+        @@media (max-width: 991.98px) {
+            .auth-shell {
+                padding: 18px 0;
+            }
+
+            .auth-brand {
+                min-height: auto;
+                padding: 28px;
+            }
+
+            .auth-brand h1 {
+                margin-top: 36px;
+            }
+        }
+
+        @@media (max-width: 575.98px) {
+            .auth-panel {
+                padding: 24px 18px;
+            }
+
+            .auth-topbar {
+                align-items: flex-start;
+                flex-direction: column;
+                margin-bottom: 28px;
+            }
+
+            .auth-switch,
+            .auth-switch a {
+                width: 100%;
+            }
+
+            .auth-switch a {
+                text-align: center;
+            }
+        }
+    </style>
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+    <main class="auth-shell">
+        <div class="container">
+            <div class="auth-frame">
+                <div class="row g-0">
+                    <div class="col-lg-6 d-none d-lg-block">
+                        <section class="auth-brand">
+                            <a asp-area="" asp-controller="Home" asp-action="Index" class="auth-brand-mark">
+                                <i class="bi bi-lightning-charge-fill"></i>
+                                <span>ApexZenith</span>
+                            </a>
+                            <h1>Secure access to your ApexZenith account.</h1>
+                            <p>Sign in or create an account to continue with ApexZenith.</p>
+                            @* <div class="auth-chip-row" aria-label="ApexZenith capabilities">
+                                <span class="auth-chip">Client access</span>
+                                <span class="auth-chip">Service updates</span>
+                                <span class="auth-chip">Account tools</span>
+                            </div> *@
+                        </section>
+                    </div>
+                    <div class="col-12 col-lg-6">
+                        <section class="auth-panel">
+                            <div class="auth-topbar">
+                                <a asp-area="" asp-controller="Home" asp-action="Index" class="auth-home-link">
+                                    <i class="bi bi-arrow-left"></i>
+                                    <span>Home</span>
+                                </a>
+                                <nav class="auth-switch" aria-label="Authentication">
+                                    <a asp-area="Admin" asp-controller="Account" asp-action="Login"
+                                       class="@(string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Login", StringComparison.OrdinalIgnoreCase) ? "active" : null)">Login</a>
+                                    <a asp-area="Admin" asp-controller="Account" asp-action="Register"
+                                       class="@(string.Equals(ViewContext.RouteData.Values["action"]?.ToString(), "Register", StringComparison.OrdinalIgnoreCase) ? "active" : null)">Register</a>
+                                </nav>
+                            </div>
+                            @RenderBody()
+                        </section>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="~/assets/vendor/bootstrap/js/bootstrap.bundle.min.js" asp-append-version="true"></script>
+    <script src="~/adminlte/adminlte.min.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

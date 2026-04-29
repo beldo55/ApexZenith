@@ -1,0 +1,41 @@
+﻿
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+
+<!-- About Section -->
+<section id="about" class="about section">
+
+
+        <div class="row position-relative">
+
+            <div class="col-lg-7 about-img" data-aos="zoom-out" data-aos-delay="200"><img src=@Model.About.PhotoUrl></div>
+
+            <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
+                <h2 class="inner-title">@Model.About.Title</h2>
+                <div class="our-story">
+                    <h4>Who we are</h4>
+                    <h3>Our Story</h3>
+                    <p>We partner with organizations that need practical digital systems, clear communication, and a reliable team that can deliver without unnecessary complexity.</p>
+                    <ul>
+                        <li><i class="bi bi-check-circle"></i> <span>Digital solutions tailored to business goals</span></li>
+                        <li><i class="bi bi-check-circle"></i> <span>Clear processes that keep teams aligned</span></li>
+                        <li><i class="bi bi-check-circle"></i> <span>Long-term support built around maintainability</span></li>
+                    </ul>
+                    <p>@Model.About.Content</p>
+
+                    <div class="watch-video d-flex align-items-center position-relative">
+                        <i class="bi bi-play-circle"></i>
+                        <a href="https://www.youtube.com/watch?v=Y7f98aduVJ8" class="glightbox stretched-link">Watch Video</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+</section><!-- /About Section -->

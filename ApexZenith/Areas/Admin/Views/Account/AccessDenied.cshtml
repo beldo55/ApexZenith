@@ -1,0 +1,14 @@
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminAuthLayout.cshtml";
+}
+<div class="text-center">
+    <div class="display-6 mb-2 text-danger"><i class="bi bi-shield-lock"></i></div>
+    <p class="text-secondary mb-4">You do not have permission to open that page.</p>
+    <div class="d-grid gap-2">
+        <a class="btn btn-primary" asp-area="Admin" asp-controller="Admin" asp-action="Index">Go to dashboard</a>
+        <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post">
+            @Html.AntiForgeryToken()
+            <button type="submit" class="btn btn-outline-secondary w-100">Sign out</button>
+        </form>
+    </div>
+</div>

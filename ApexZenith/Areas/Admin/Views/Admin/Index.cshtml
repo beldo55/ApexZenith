@@ -1,0 +1,203 @@
+@model ApexZenith.Areas.Admin.Controllers.AdminDashboardViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Executive Overview";
+}
+
+<div class="container-fluid px-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 pt-3">
+        <div>
+            <h2 class="fw-bold text-dark mb-1">ApexZenith Command Center</h2>
+            <p class="text-muted small mb-0"><i class="bi bi-clock-history me-1"></i> System Status: <span class="text-success fw-semibold">Operational</span> | Last updated: @DateTime.Now.ToString("HH:mm")</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a asp-area="Admin" asp-controller="AdminContent" asp-action="Index" class="btn btn-white border shadow-sm btn-sm">
+                <i class="bi bi-pencil-square me-1"></i> Content Manager
+            </a>
+            <a asp-area="Admin" asp-controller="AdminManage" asp-action="SystemSettings" class="btn btn-primary btn-sm shadow-sm">
+                <i class="bi bi-gear-fill me-1"></i> Configuration
+            </a>
+        </div>
+    </div>
+
+    <div class="row g-3 mb-4">
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm bg-primary text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-white-50 small mb-1 fw-bold">TOTAL USERS</p>
+                            <h2 class="mb-0 fw-bold">@Model.UserCount</h2>
+                        </div>
+                        <div class="fs-1 text-white-50"><i class="bi bi-people"></i></div>
+                    </div>
+                    <div class="mt-3 small text-white-50">
+                        <span class="text-white fw-bold">@Model.AdminUserCount</span> Admins Active
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm bg-dark text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-muted small mb-1 fw-bold text-uppercase">Active Roles</p>
+                            <h2 class="mb-0 fw-bold text-white">@Model.RoleCount</h2>
+                        </div>
+                        <div class="fs-1 text-muted"><i class="bi bi-shield-check"></i></div>
+                    </div>
+                    <div class="mt-3 small text-muted">Permissions locked</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm bg-success text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-white-50 small mb-1 fw-bold text-uppercase">Portfolio Growth</p>
+                            <h2 class="mb-0 fw-bold">@Model.ServicesCount</h2>
+                        </div>
+                        <div class="fs-1 text-white-50"><i class="bi bi-lightning-charge"></i></div>
+                    </div>
+                    <div class="mt-3 small text-white-50">Deployed Services</div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-xl-3">
+            <div class="card border-0 shadow-sm bg-danger text-white h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <p class="text-white-50 small mb-1 fw-bold text-uppercase">Media Hub</p>
+                            <h2 class="mb-0 fw-bold">@Model.NewsCount</h2>
+                        </div>
+                        <div class="fs-1 text-white-50"><i class="bi bi-megaphone"></i></div>
+                    </div>
+                    <div class="mt-3 small text-white-50">Published Articles</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <div class="col-12 col-xl-8">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-header bg-transparent border-bottom py-3 d-flex justify-content-between align-items-center">
+                    <h5 class="fw-bold mb-0">Editorial Activity</h5>
+                    <span class="badge bg-light text-dark border">Recent 5 Posts</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead class="table-light">
+                                <tr class="small text-uppercase text-muted">
+                                    <th class="ps-4">Headline</th>
+                                    <th>Author</th>
+                                    <th>Status</th>
+                                    <th class="text-end pe-4">Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.LatestNews.Take(5))
+                                {
+                                    <tr>
+                                        <td class="ps-4 fw-semibold text-dark">@item.Headline</td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="avatar-xs me-2 bg-primary-soft text-primary rounded-circle text-center" style="width:24px; height:24px; font-size: 10px; line-height:24px;">
+                                                    @(item.PostedBy?.Substring(0, 1) ?? "A")
+                                                </div>
+                                                <span class="small">@item.PostedBy</span>
+                                            </div>
+                                        </td>
+                                        <td><span class="badge rounded-pill bg-success-soft text-success border border-success">Live</span></td>
+                                        <td class="text-end pe-4 text-muted small">@item.Date.ToString("MMM dd")</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-xl-4">
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-header bg-transparent border-0 pt-3">
+                    <h5 class="fw-bold mb-0">Platform Vitals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group list-group-flush">
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div class="text-muted small"><i class="bi bi-building me-2"></i> Active Clients</div>
+                            <span class="fw-bold">@Model.ClientCount</span>
+                        </div>
+                        <div class="list-group-item px-0 d-flex justify-content-between align-items-center">
+                            <div class="text-muted small"><i class="bi bi-person-badge me-2"></i> Team Size</div>
+                            <span class="fw-bold text-primary">@Model.TeamCount</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-transparent border-bottom py-3">
+                    <h5 class="fw-bold mb-0 text-danger">Urgent Inquiries</h5>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        @foreach (var contact in Model.LatestContacts.Take(3))
+                        {
+                            <a href="#" class="list-group-item list-group-item-action border-0 p-3">
+                                <div class="d-flex w-100 justify-content-between">
+                                    <h6 class="mb-1 fw-bold">@contact.FullName</h6>
+                                    <small class="text-muted">Today</small>
+                                </div>
+                                <p class="mb-1 small text-truncate text-muted">@contact.Subject</p>
+                                <small class="text-primary">@contact.Email</small>
+                            </a>
+                        }
+                    </div>
+                </div>
+                <div class="card-footer bg-transparent border-0 text-center pb-3">
+                    <button class="btn btn-link btn-sm text-decoration-none">View All Inbox</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    body {
+        background-color: #f8f9fa;
+    }
+
+    .card {
+        border-radius: 12px;
+    }
+
+    .bg-success-soft {
+        background-color: rgba(25, 135, 84, 0.1) !important;
+    }
+
+    .bg-primary-soft {
+        background-color: rgba(13, 110, 253, 0.1) !important;
+    }
+
+    .bg-dark .text-muted {
+        color: rgba(255, 255, 255, 0.6) !important;
+    }
+
+    .table thead th {
+        border-top: none;
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+    }
+
+    .avatar-xs {
+        display: inline-block;
+        background: #e9ecef;
+    }
+</style>

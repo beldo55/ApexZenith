@@ -1,0 +1,108 @@
+@model ApexZenith.Areas.Admin.Controllers.AdminContentOverviewViewModel
+@{
+    Layout = "~/Areas/Admin/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Website content";
+}
+
+<partial name="_ContentNavigation" model="@("Index")" />
+
+<div class="card admin-table-card mb-3">
+    <div class="card-body d-flex flex-column flex-lg-row justify-content-between gap-3">
+        <div>
+            <h4 class="mb-1">Content management overview</h4>
+            <p class="text-secondary mb-0">Each content table now has its own page so updates are focused, faster to review, and easier to maintain.</p>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+            <a asp-action="News" class="btn btn-primary btn-sm">
+                <i class="bi bi-newspaper me-1"></i>Manage news
+            </a>
+            <a asp-action="Services" class="btn btn-outline-primary btn-sm">
+                <i class="bi bi-briefcase me-1"></i>Manage services
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-primary mb-0">
+            <div class="inner">
+                <h3>@Model.AboutCount</h3>
+                <p>About</p>
+            </div>
+            <i class="bi bi-info-circle-fill small-box-icon"></i>
+            <a asp-action="About" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-success mb-0">
+            <div class="inner">
+                <h3>@Model.AddressCount</h3>
+                <p>Addresses</p>
+            </div>
+            <i class="bi bi-geo-alt-fill small-box-icon"></i>
+            <a asp-action="Addresses" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-warning mb-0">
+            <div class="inner">
+                <h3>@Model.ServicesCount</h3>
+                <p>Services</p>
+            </div>
+            <i class="bi bi-briefcase-fill small-box-icon"></i>
+            <a asp-action="Services" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-info mb-0">
+            <div class="inner">
+                <h3>@Model.ClientsCount</h3>
+                <p>Clients</p>
+            </div>
+            <i class="bi bi-building-fill small-box-icon"></i>
+            <a asp-action="Clients" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-secondary mb-0">
+            <div class="inner">
+                <h3>@Model.TeamCount</h3>
+                <p>Team members</p>
+            </div>
+            <i class="bi bi-people-fill small-box-icon"></i>
+            <a asp-action="TeamMembers" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-danger mb-0">
+            <div class="inner">
+                <h3>@Model.TestimonialsCount</h3>
+                <p>Testimonials</p>
+            </div>
+            <i class="bi bi-chat-square-quote-fill small-box-icon"></i>
+            <a asp-action="Testimonials" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-dark mb-0">
+            <div class="inner">
+                <h3>@Model.CategoriesCount</h3>
+                <p>Categories</p>
+            </div>
+            <i class="bi bi-tags-fill small-box-icon"></i>
+            <a asp-action="Categories" class="small-box-footer text-white">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+    <div class="col-12 col-md-6 col-xl-3">
+        <div class="small-box text-bg-light mb-0 border">
+            <div class="inner">
+                <h3>@Model.NewsCount</h3>
+                <p>News posts</p>
+                <small class="text-secondary">Latest: @(Model.LastNewsDate?.ToString("dd MMM yyyy") ?? "N/A")</small>
+            </div>
+            <i class="bi bi-newspaper small-box-icon"></i>
+            <a asp-action="News" class="small-box-footer">Manage <i class="bi bi-arrow-right-short"></i></a>
+        </div>
+    </div>
+</div>
