@@ -5,7 +5,7 @@ namespace ApexZenith.Models
     public class NewsCategory
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
 
         [ValidateNever]
         public ICollection<News> NewsList { get; set; } = [];
@@ -15,12 +15,12 @@ namespace ApexZenith.Models
     {
         public int Id { get; set; }
 
-        public string Headline { get; set; }
-        public string Content { get; set; }
-        public string PhotoUrl { get; set; }
+        public string Headline { get; set; } = string.Empty;
+        public string Content { get; set; } = string.Empty;
+        public string? PhotoUrl { get; set; }
 
-        public string Author { get; set; }
-        public string PostedBy { get; set; }
+        public string Author { get; set; } = string.Empty;
+        public string PostedBy { get; set; } = string.Empty;
 
         public DateTime PostedDate { get; set; }
 
@@ -45,10 +45,10 @@ namespace ApexZenith.Models
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
-        public string Email { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
 
-        public string Content { get; set; }
+        public string Content { get; set; } = string.Empty;
 
         public DateTime Date { get; set; } = DateTime.UtcNow;
 
@@ -65,7 +65,7 @@ namespace ApexZenith.Models
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Email { get; set; }
 
         public string? Content { get; set; }

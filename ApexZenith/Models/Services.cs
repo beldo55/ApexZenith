@@ -8,9 +8,9 @@ namespace ApexZenith.Models
     {
         
         public int Id { get; set; }
-        public string Name { get; set; }
-        public string Contents { get; set; }
-        public string PhotoUrl { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Contents { get; set; } = string.Empty;
+        public string? PhotoUrl { get; set; }
 
 
     }

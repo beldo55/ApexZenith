@@ -2,13 +2,11 @@ using ApexZenith.Data;
 using ApexZenith.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
-using System.Reflection.Metadata;
-using static System.Runtime.InteropServices.JavaScript.JSType;
+using Microsoft.EntityFrameworkCore;
 
 namespace ApexZenith.Controllers
 {
     public class HomeController : Controller
-
     {
         private readonly ApplicationDbContext _context;
 
@@ -16,29 +14,37 @@ namespace ApexZenith.Controllers
         {
             _context = context;
         }
-    
-        public IActionResult Index()
+
+        public async Task<IActionResult> Index()
         {
             var model = new HomePageViewModel
             {
-                About = _context.About.FirstOrDefault(),
-                Services = _context.Services.OrderBy(s => s.Id).Take(6).ToList(),
-                Clients = _context.Client.OrderBy(c => c.Id).ToList(),
-                News = _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Take(6).ToList()
+                About = await _context.About.FirstOrDefaultAsync(),
+                Services = await _context.Services.OrderBy(s => s.Id).Take(6).ToListAsync(),
+                Clients = await _context.Client.OrderBy(c => c.Id).ToListAsync(),
+                News = await _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Take(6)
+                    .Select(n => new News
+                    {
+                        Id = n.Id,
+                        Headline = n.Headline,
+                        Content = n.Content,
+                        PhotoUrl = n.PhotoUrl,
+                        Author = n.Author,
+                        PostedBy = n.PostedBy,
+                        Date = n.Date,
+                        Category = new List<NewsCategory> { new NewsCategory { Name = n.PostedBy } }
+                    }).ToListAsync()
             };
             return View(model);
         }
 
         public IActionResult Contact()
-
-
         {
+            var model = new ContactPageView
+            {
+                Address = _context.Address.FirstOrDefault() ?? new Address()
+            };
 
-            var address = _context.Client.OrderBy(c => c.Id).ToList();
-
-            ContactPageView model = new ContactPageView();
-
-           
             return View(model);
         }
 
@@ -46,9 +52,16 @@ namespace ApexZenith.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Contact(ContactPageView model)
         {
-            if (model == null)
+            if (model?.Contact == null)
             {
                 return BadRequest("Invalid form submission");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                // Re-populate any view data required by the view (e.g. Address) before returning
+                model.Address ??= _context.Address.FirstOrDefault() ?? new Address();
+                return View(model);
             }
 
             var contact = new Contact
@@ -60,36 +73,33 @@ namespace ApexZenith.Controllers
             };
 
             _context.Add(contact);
-            var Id= await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
-            return RedirectToAction("Success", contact);
+            return RedirectToAction(nameof(Success), new { id = contact.Id });
         }
-        public IActionResult Success(Contact model)
-            
+
+        public async Task<IActionResult> Success(int id)
         {
-            var conctact = new Contact
+            var contact = await _context.Set<Contact>().FindAsync(id);
+            if (contact == null)
             {
-                FullName = model.FullName,
-                Email = model.Email,
-                Subject = model.Subject,
-                Message = model.Message
+                return NotFound();
+            }
 
-            };
-
-            return View(model);
+            return View(contact);
         }
 
         public IActionResult About()
         {
             var model = new AboutPageViewModel
             {
-                About = _context.About.FirstOrDefault(),
+                About = _context.About.FirstOrDefault() ?? new About(),
                 Team = _context.Team.OrderBy(t => t.Id).ToList(),
                 Clients = _context.Client.OrderBy(c => c.Id).ToList(),
-
             };
             return View(model);
         }
+
         public IActionResult Testimonials()
         {
             return View(new TestimonialsPageViewModel
@@ -105,6 +115,7 @@ namespace ApexZenith.Controllers
                 Team = _context.Team.OrderBy(t => t.Id).ToList()
             });
         }
+
         public IActionResult Services()
         {
             return View(new ServicesPageViewModel
@@ -112,11 +123,12 @@ namespace ApexZenith.Controllers
                 Services = _context.Services.OrderBy(s => s.Id).ToList()
             });
         }
-        public IActionResult News()
+
+        public async Task<IActionResult> News()
         {
             return View(new NewsPageViewModel
             {
-                AllNews = _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Select(n => new News
+                AllNews = await _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Select(n => new News
                 {
                     Id = n.Id,
                     Headline = n.Headline,
@@ -126,12 +138,13 @@ namespace ApexZenith.Controllers
                     PostedBy = n.PostedBy,
                     Date = n.Date,
                     Category = new List<NewsCategory> { new NewsCategory { Name = n.PostedBy } }
-                }).ToList()
+                }).ToListAsync()
             });
         }
-        public IActionResult NewsDetail(int id)
+
+        public async Task<IActionResult> NewsDetail(int id)
         {
-            var news = _context.News.FirstOrDefault(n => n.Id == id && !n.IsDeleted);
+            var news = await _context.News.FirstOrDefaultAsync(n => n.Id == id && !n.IsDeleted);
             if (news == null)
             {
                 return NotFound();
@@ -150,7 +163,7 @@ namespace ApexZenith.Controllers
                     Date = news.Date,
                     Category = new List<NewsCategory> { new NewsCategory { Name = news.PostedBy } }
                 },
-                AllNews = _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Select(n => new News
+                AllNews = await _context.News.Where(n => !n.IsDeleted).OrderByDescending(n => n.Date).Select(n => new News
                 {
                     Id = n.Id,
                     Headline = n.Headline,
@@ -158,50 +171,12 @@ namespace ApexZenith.Controllers
                     PhotoUrl = n.PhotoUrl,
                     Author = n.Author,
                     PostedBy = n.PostedBy,
-                    PostedDate = n.Date,
+                    Date = n.Date,
                     Category = new List<NewsCategory> { new NewsCategory { Name = n.PostedBy } }
-                }).ToList()
+                }).ToListAsync()
             };
             return View(model);
         }
-
-
-        public IActionResult Pricing()
-        {
-            return View();
-        }
-
-        public IActionResult Portfolio()
-        {
-            return View();
-        }
-        public IActionResult PortfolioDetails()
-        {
-            return View();
-        }
-
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // 2. POST: Receive the data from the form
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(News model)
-        {
-            if (ModelState.IsValid)
-            {
-                // Add the blog to the context
-                _context.Add(model);
-                // Save to PostgreSQL
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction(nameof(Index));
-            }
-            return View(model);
-        }
-
 
         public IActionResult Privacy()
         {

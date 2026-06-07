@@ -1,6 +1,5 @@
 ﻿<header id="header" class="header d-flex align-items-center sticky-top">
     <div class="container position-relative d-flex align-items-center">
-
         <a asp-controller="Home" asp-action="Index" class="logo site-brand d-flex align-items-center me-auto">
             <span class="site-brand-icon" aria-hidden="true">
                 <i class="bi bi-lightning-charge-fill"></i>
@@ -10,7 +9,9 @@
 
         <nav id="navmenu" class="navmenu">
             <ul>
-                <li><a asp-controller="Home" asp-action="Index" class="active">Home</a></li>
+                <li>
+                    <a asp-controller="Home" asp-action="Index" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" && ViewContext.RouteData.Values["action"]?.ToString() == "Index" ? "active" : null)">Home</a>
+                </li>
                 <li class="dropdown">
                     <a asp-controller="Home" asp-action="About"><span>About</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
                     <ul>
@@ -23,63 +24,56 @@
                 <li><a asp-controller="Home" asp-action="Contact">Contact</a></li>
                 <li class="auth-nav-item">
                     <div class="header-auth-actions d-flex align-items-center gap-2">
-                    @if (User.Identity?.IsAuthenticated == true && User.IsInRole("Admin"))
-                    {
-                            <a asp-area="Admin" asp-controller="Admin" asp-action="Index"
-                               class="btn btn-outline-primary btn-sm auth-button">
-                            <i class="bi bi-speedometer2"></i>
-                            <span>Dashboard</span>
-                        </a>
+
+                        @*
+                            FIX ── Guard against IIS/Windows ghost identity.
+                            
+                            The original check (User.Identity?.IsAuthenticated == true) was
+                            true for EVERY visitor on site4now because IIS Windows
+                            Authentication populates HttpContext.User with the app-pool
+                            machine account before ASP.NET Identity cookie auth even runs.
+                            
+                            The fix adds a second condition: we only treat the user as
+                            logged-in when the authentication type is the Identity cookie
+                            scheme ("Identity.Application"). A Windows/IIS machine-account
+                            principal uses a different AuthenticationType, so it is treated
+                            as anonymous here even though IsAuthenticated is technically true.
+                        *@
+                        @{
+                            var isRealUser = User.Identity?.IsAuthenticated == true
+                            && User.Identity.AuthenticationType == Microsoft.AspNetCore.Identity.IdentityConstants.ApplicationScheme;
+                        }
+
+                        @if (isRealUser)
+                        {
+                            @if (User.IsInRole("Admin"))
+                            {
+                                <a asp-area="Admin" asp-controller="Admin" asp-action="Index" class="btn btn-outline-primary btn-sm auth-button">
+                                    <i class="bi bi-speedometer2"></i>
+                                    <span>Dashboard</span>
+                                </a>
+                            }
 
                             <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post" class="auth-form">
-                                <button class="btn btn-primary btn-sm auth-button" type="submit">
+                                @Html.AntiForgeryToken()
+                                <button class="btn btn-danger btn-sm auth-button" type="submit">
                                     <i class="bi bi-box-arrow-right"></i>
                                     <span>Logout</span>
                                 </button>
-                        </form>
-                    }
-                    else if (User.Identity?.IsAuthenticated == true)
-                    {
-                        <form asp-area="Admin" asp-controller="Account" asp-action="Logout" method="post"
-                              class="auth-form">
-                                <button class="btn btn-success btn-sm auth-button" type="submit">
-                                    <i class="bi bi-box-arrow-right"></i>
-                                    <span>Logout</span>
-                                </button>
-                        </form>
-                    }
-
-                    else if (User.Identity?.IsAuthenticated == false)
-                    {
-                        <a asp-area="Admin" asp-controller="Account" asp-action="Login"
-                               class="btn btn-outline-primary btn-sm auth-button">
-                            <i class="bi bi-box-arrow-in-right"></i>
-                            <span>Login</span>
-                        </a>
-
-
-                        <a asp-area="Admin" asp-controller="Account" asp-action="Register"
-                           class="btn btn-success btn-sm auth-button">
-                            <i class="bi bi-person-plus"></i>
-                            <span>Register</span>
-                        </a>
-                    }
+                            </form>
+                        }
+                        else
+                        {
+                            <a asp-area="Admin" asp-controller="Account" asp-action="Login" class="btn btn-outline-primary btn-sm auth-button">
+                                <i class="bi bi-box-arrow-in-right"></i>
+                                <span>Login</span>
+                            </a>
+                        }
                     </div>
-
                 </li>
             </ul>
 
-           
             <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
         </nav>
-
-
-        
-
-
-       </div>
-       
-
-    
+    </div>
 </header>
-
