@@ -12,7 +12,7 @@ public class HomePageViewModel
 
 public class AboutPageViewModel
 {
-    public About About { get; set; }
+    public About About { get; set; } = new About();
     public List<Team> Team { get; set; } = new();
     public List<Client> Clients { get; set; } = new();
 }
@@ -34,30 +34,27 @@ public class TestimonialsPageViewModel
 
 public class NewsPageViewModel
 {
-    
-        public News? CurrentNews { get; set; }
-        public List<News>? AllNews { get; set; }
-    
+    public News CurrentNews { get; set; } = new News();
+    public List<News> AllNews { get; set; } = new();
 }
 
 
 public class ContactPageView
 {
-    public Contact Contact { get; set; } 
+    public Contact Contact { get; set; } = new Contact();
     public Address Address { get; set; } = new Address();
 }
 
 public class RegisterVM
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
-    public string ConfirmPassword { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
 }
 
 public class LoginVM
 {
-    public string Email { get; set; }
-    public string Password { get; set; }
+    public string Email { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
     public bool RememberMe { get; set; }
 }
-

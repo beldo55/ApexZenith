@@ -1,4 +1,8 @@
 @model ApexZenith.Models.NewsPageViewModel
+@{
+    var currentNews = Model.CurrentNews;
+    var allNews = Model.AllNews;
+}
 
 <div class="container">
     <div class="row">
@@ -7,28 +11,28 @@
                 <div class="container">
                     <article class="article">
                         <div class="post-img">
-                            <img src="@Model.CurrentNews.PhotoUrl" class="img-fluid" alt="">
+                            <img src="@(currentNews.PhotoUrl ?? string.Empty)" class="img-fluid" alt="">
                         </div>
-                        <h2 class="title">@Model.CurrentNews.Headline</h2>
+                        <h2 class="title">@currentNews.Headline</h2>
                         <div class="meta-top">
                             <ul>
                                 <li class="d-flex align-items-center">
                                     <i class="bi bi-person"></i>
-                                    <span>@Model.CurrentNews.Author</span>
+                                    <span>@currentNews.Author</span>
                                 </li>
                                 <li class="d-flex align-items-center">
                                     <i class="bi bi-clock"></i>
-                                    <time datetime="@Model.CurrentNews.Date.ToString("yyyy-MM-dd")">@Model.CurrentNews.Date.ToString("yyyy-MM-dd")</time>
+                                    <time datetime="@currentNews.Date.ToString("yyyy-MM-dd")">@currentNews.Date.ToString("yyyy-MM-dd")</time>
                                 </li>
                             </ul>
                         </div>
                         <div class="content">
-                            @Model.CurrentNews.Content
+                            @currentNews.Content
                         </div>
                         <div class="meta-bottom">
                             <i class="bi bi-folder"></i>
                             <ul class="cats">
-                            <li><a href="#">@Model.CurrentNews.Category</a></li>
+                            <li><a href="#">@currentNews.PostedBy</a></li>
                             </ul>
                         </div>
                     </article>
@@ -39,7 +43,7 @@
             <div class="widgets-container">
                 <div class="recent-posts-widget widget-item">
                     <h3 class="widget-title">Recent Insights</h3>
-                    @foreach (var item in Model.AllNews.Where(b => b.Id != Model.CurrentNews.Id).Take(5))
+                    @foreach (var item in allNews.Where(b => b.Id != currentNews.Id).Take(5))
                     {
                         <div class="post-item">
                             <h4><a asp-action="NewsDetail" asp-route-id="@item.Id">@item.Headline</a></h4>
@@ -50,9 +54,9 @@
                 <div class="tags-widget widget-item">
                     <h3 class="widget-title">Topics</h3>
                     <ul>
-                        @foreach (var tag in Model.AllNews.SelectMany(b => b.Category).GroupBy(t => t.Name).Select(g => g.First()))
+                        @foreach (var tag in allNews.Select(n => n.PostedBy).Where(name => !string.IsNullOrWhiteSpace(name)).Distinct())
                         {
-                            <li><a href="#">@tag.Name</a></li>
+                            <li><a href="#">@tag</a></li>
                         }
                     </ul>
                 </div>

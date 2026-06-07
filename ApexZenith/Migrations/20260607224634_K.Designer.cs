@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace ApexZenith.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260429130556_firstmg")]
-    partial class firstmg
+    [Migration("20260607224634_K")]
+    partial class K
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -71,17 +71,12 @@ namespace ApexZenith.Migrations
                     b.Property<int?>("ParentId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ParentId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("SettingsTabId")
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ParentId");
-
-                    b.HasIndex("ParentId1");
 
                     b.HasIndex("ParentId", "Order");
 
@@ -99,9 +94,6 @@ namespace ApexZenith.Migrations
                     b.Property<int>("ResourceId")
                         .HasColumnType("int");
 
-                    b.Property<int?>("ResourceId1")
-                        .HasColumnType("int");
-
                     b.Property<string>("RoleId")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -109,8 +101,6 @@ namespace ApexZenith.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("ResourceId");
-
-                    b.HasIndex("ResourceId1");
 
                     b.ToTable("ResourceRoles", (string)null);
                 });
@@ -128,7 +118,6 @@ namespace ApexZenith.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Title")
@@ -266,7 +255,6 @@ namespace ApexZenith.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("PhotoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PostedBy")
@@ -379,7 +367,6 @@ namespace ApexZenith.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PhotoUrl")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -399,7 +386,7 @@ namespace ApexZenith.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("InstergramUrl")
+                    b.Property<string>("InstagramUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -668,14 +655,10 @@ namespace ApexZenith.Migrations
 
             modelBuilder.Entity("ApexZenith.Areas.Admin.Models.Resource", b =>
                 {
-                    b.HasOne("ApexZenith.Areas.Admin.Models.Resource", null)
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("ApexZenith.Areas.Admin.Models.Resource", "Parent")
                         .WithMany("Children")
-                        .HasForeignKey("ParentId1");
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Restrict);
 
                     b.Navigation("Parent");
                 });
@@ -683,14 +666,10 @@ namespace ApexZenith.Migrations
             modelBuilder.Entity("ApexZenith.Areas.Admin.Models.ResourceRole", b =>
                 {
                     b.HasOne("ApexZenith.Areas.Admin.Models.Resource", null)
-                        .WithMany()
+                        .WithMany("RoleRules")
                         .HasForeignKey("ResourceId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("ApexZenith.Areas.Admin.Models.Resource", null)
-                        .WithMany("RoleRules")
-                        .HasForeignKey("ResourceId1");
                 });
 
             modelBuilder.Entity("ApexZenith.Models.NewsComment", b =>

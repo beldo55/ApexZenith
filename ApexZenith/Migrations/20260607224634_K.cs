@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace ApexZenith.Migrations
 {
     /// <inheritdoc />
-    public partial class firstmg : Migration
+    public partial class K : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,7 +19,7 @@ namespace ApexZenith.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Title = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -123,7 +123,7 @@ namespace ApexZenith.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Headline = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Author = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PostedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -157,7 +157,6 @@ namespace ApexZenith.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ParentId = table.Column<int>(type: "int", nullable: true),
-                    ParentId1 = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DeveloperNote = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     Area = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -178,11 +177,6 @@ namespace ApexZenith.Migrations
                         principalTable: "Resources",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_Resources_Resources_ParentId1",
-                        column: x => x.ParentId1,
-                        principalTable: "Resources",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -193,7 +187,7 @@ namespace ApexZenith.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Contents = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -210,7 +204,7 @@ namespace ApexZenith.Migrations
                     Position = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PhotoUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     FacebookUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstergramUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstagramUrl = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LinkedInUrl = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -394,8 +388,7 @@ namespace ApexZenith.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     ResourceId = table.Column<int>(type: "int", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ResourceId1 = table.Column<int>(type: "int", nullable: true)
+                    RoleId = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -406,11 +399,6 @@ namespace ApexZenith.Migrations
                         principalTable: "Resources",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ResourceRoles_Resources_ResourceId1",
-                        column: x => x.ResourceId1,
-                        principalTable: "Resources",
-                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -496,11 +484,6 @@ namespace ApexZenith.Migrations
                 column: "ResourceId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ResourceRoles_ResourceId1",
-                table: "ResourceRoles",
-                column: "ResourceId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Resources_ParentId",
                 table: "Resources",
                 column: "ParentId");
@@ -509,11 +492,6 @@ namespace ApexZenith.Migrations
                 name: "IX_Resources_ParentId_Order",
                 table: "Resources",
                 columns: new[] { "ParentId", "Order" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Resources_ParentId1",
-                table: "Resources",
-                column: "ParentId1");
         }
 
         /// <inheritdoc />

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
-namespace Amaincompany.Data;
+namespace ApexZenith.Data;
 
 public static partial class SeedData
 {

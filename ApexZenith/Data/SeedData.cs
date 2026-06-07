@@ -74,7 +74,7 @@ public static partial class SeedData
                     Position = "Managing Director",
                     PhotoUrl = "/assets/img/team/team-1.jpg",
                     FacebookUrl = "#",
-                    InstergramUrl = "#",
+                    InstagramUrl = "#",
                     LinkedInUrl = "#"
                 },
                 new Team
@@ -83,7 +83,7 @@ public static partial class SeedData
                     Position = "Operations Lead",
                     PhotoUrl = "/assets/img/team/team-2.jpg",
                     FacebookUrl = "#",
-                    InstergramUrl = "#",
+                    InstagramUrl = "#",
                     LinkedInUrl = "#"
                 }
             );
@@ -164,58 +164,58 @@ public static partial class SeedData
         await context.SaveChangesAsync();
     }
 
-    public static async Task EnsureBootstrapAdminAsync(
-        UserManager<IdentityUser> userManager,
-        RoleManager<IdentityRole> roleManager,
-        IConfiguration configuration,
-        IHostEnvironment environment)
-    {
-        var adminEmail = configuration["SeedAdmin:Email"];
-        var adminPassword = configuration["SeedAdmin:Password"];
+    //public static async Task EnsureBootstrapAdminAsync(
+    //    UserManager<IdentityUser> userManager,
+    //    RoleManager<IdentityRole> roleManager,
+    //    IConfiguration configuration,
+    //    IHostEnvironment environment)
+    //{
+    //    var adminEmail = configuration["SeedAdmin:Email"];
+    //    var adminPassword = configuration["SeedAdmin:Password"];
 
-        if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
-        {
-            return;
-        }
+    //    if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
+    //    {
+    //        return;
+    //    }
 
-        var adminRole = "Admin";
-        if (!await roleManager.RoleExistsAsync(adminRole))
-        {
-            var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
-            if (!roleResult.Succeeded)
-            {
-                throw new InvalidOperationException("Failed to ensure the Admin role exists.");
-            }
-        }
+    //    var adminRole = "Admin";
+    //    if (!await roleManager.RoleExistsAsync(adminRole))
+    //    {
+    //        var roleResult = await roleManager.CreateAsync(new IdentityRole(adminRole));
+    //        if (!roleResult.Succeeded)
+    //        {
+    //            throw new InvalidOperationException("Failed to ensure the Admin role exists.");
+    //        }
+    //    }
 
-        var existingUser = await userManager.FindByEmailAsync(adminEmail);
-        if (existingUser is null)
-        {
-            var user = new IdentityUser
-            {
-                UserName = adminEmail,
-                Email = adminEmail,
-                EmailConfirmed = true
-            };
+    //    var existingUser = await userManager.FindByEmailAsync(adminEmail);
+    //    if (existingUser is null)
+    //    {
+    //        var user = new IdentityUser
+    //        {
+    //            UserName = adminEmail,
+    //            Email = adminEmail,
+    //            EmailConfirmed = true
+    //        };
 
-            var createResult = await userManager.CreateAsync(user, adminPassword);
-            if (!createResult.Succeeded)
-            {
-                var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Failed to create bootstrap admin user: {errors}");
-            }
+    //        var createResult = await userManager.CreateAsync(user, adminPassword);
+    //        if (!createResult.Succeeded)
+    //        {
+    //            var errors = string.Join("; ", createResult.Errors.Select(e => e.Description));
+    //            throw new InvalidOperationException($"Failed to create bootstrap admin user: {errors}");
+    //        }
 
-            existingUser = user;
-        }
+    //        existingUser = user;
+    //    }
 
-        if (!await userManager.IsInRoleAsync(existingUser, adminRole))
-        {
-            var roleAssignResult = await userManager.AddToRoleAsync(existingUser, adminRole);
-            if (!roleAssignResult.Succeeded)
-            {
-                var errors = string.Join("; ", roleAssignResult.Errors.Select(e => e.Description));
-                throw new InvalidOperationException($"Failed to assign Admin role to bootstrap user: {errors}");
-            }
-        }
-    }
+    //    if (!await userManager.IsInRoleAsync(existingUser, adminRole))
+    //    {
+    //        var roleAssignResult = await userManager.AddToRoleAsync(existingUser, adminRole);
+    //        if (!roleAssignResult.Succeeded)
+    //        {
+    //            var errors = string.Join("; ", roleAssignResult.Errors.Select(e => e.Description));
+    //            throw new InvalidOperationException($"Failed to assign Admin role to bootstrap user: {errors}");
+    //        }
+    //    }
+    //}
 }

@@ -361,3 +361,9 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# ASP.NET Core Data Protection keys (contain unencrypted master keys — never commit)
+**/DataProtectionKeys/
+
+# Local development settings (may contain dev secrets — keep out of git)
+**/appsettings.Development.json

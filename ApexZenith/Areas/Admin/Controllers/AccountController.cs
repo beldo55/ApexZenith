@@ -27,9 +27,17 @@ public class AccountController : Controller
     public IActionResult Login(string? returnUrl = null)
     {
         returnUrl ??= Request.Query["ReturnUrl"].FirstOrDefault();
-        if (User.Identity?.IsAuthenticated == true)
+
+        // ?????????????????????????????????????????????????????????????????
+        // FIX 1 (ghost-login guard) ?? Only redirect if the user is truly
+        //         authenticated via Identity cookie, not via a Windows/IIS
+        //         identity that snuck in. We check AuthenticationType so we
+        //         don't accidentally redirect an IIS app-pool principal.
+        // ?????????????????????????????????????????????????????????????????
+        if (User.Identity?.IsAuthenticated == true
+            && User.Identity.AuthenticationType == IdentityConstants.ApplicationScheme)
         {
-            return RedirectToLocal(returnUrl);
+            return RedirectToHome(returnUrl);
         }
 
         ViewData["Title"] = "Sign in";
@@ -47,8 +55,33 @@ public class AccountController : Controller
             return View(model);
         }
 
+        var email = model.Email.Trim();
+
+        // ?????????????????????????????????????????????????????????????????
+        // FIX 2 ?? Resolve by email first, then sign in by UserName
+        //
+        //          PasswordSignInAsync(string userName, ...) looks up the
+        //          user by UserName, not Email. As long as UserName == Email
+        //          (which is true at creation time) it works. But if an admin
+        //          ever edits a user's email through UsersManagementController
+        //          the UserName stays the old value while Email changes, so
+        //          login silently fails with "invalid credentials" even though
+        //          the password is correct.
+        //
+        //          Resolving through FindByEmailAsync first guarantees we
+        //          always sign in using the current UserName regardless of
+        //          whether it still matches the Email.
+        // ?????????????????????????????????????????????????????????????????
+        var user = await _userManager.FindByEmailAsync(email);
+        if (user == null)
+        {
+            // Don't reveal whether the email exists or not (enumeration guard)
+            ModelState.AddModelError(string.Empty, "The email or password you entered is not valid.");
+            return View(model);
+        }
+
         var result = await _signInManager.PasswordSignInAsync(
-            model.Email,
+            user.UserName!,
             model.Password,
             model.RememberMe,
             lockoutOnFailure: true);
@@ -57,16 +90,21 @@ public class AccountController : Controller
         {
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
-                //return Redirect(returnUrl);
-                return Redirect("/");
+                return Redirect(returnUrl);
             }
 
-            return Redirect("/");
+            return RedirectToHome(returnUrl);
         }
 
         if (result.IsLockedOut)
         {
-            ModelState.AddModelError(string.Empty, "This account is locked after too many failed attempts. Try again later.");
+            // ?????????????????????????????????????????????????????????????
+            // NOTE: Using the same generic message for lockout as for bad
+            //       credentials prevents user enumeration (an attacker
+            //       cannot tell whether the account exists by triggering a
+            //       lockout message vs. an invalid-credentials message).
+            // ?????????????????????????????????????????????????????????????
+            ModelState.AddModelError(string.Empty, "The email or password you entered is not valid.");
             return View(model);
         }
 
@@ -80,11 +118,19 @@ public class AccountController : Controller
     public async Task<IActionResult> Logout()
     {
         await _signInManager.SignOutAsync();
-        return Redirect("/");
+        return RedirectToAction("Index", "Home", new { area = "" });
     }
 
+    // ?????????????????????????????????????????????????????????????????????????
+    // FIX 3 ?? Lock Register behind [Authorize(Roles = "Admin")]
+    //
+    //          Previously both GET and POST were [AllowAnonymous], meaning
+    //          anyone on the internet could create an account with any role,
+    //          including "Admin". Only an existing Admin should be able to
+    //          create new staff accounts.
+    // ?????????????????????????????????????????????????????????????????????????
     [HttpGet]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     public IActionResult Register()
     {
         ViewData["Title"] = "Register staff account";
@@ -92,26 +138,29 @@ public class AccountController : Controller
     }
 
     [HttpPost]
-    //[Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Register(RegisterStaffViewModel model)
     {
-        ViewData["Title"] = "Register An account";
+        ViewData["Title"] = "Register staff account";
         if (!ModelState.IsValid)
         {
             return View(model);
         }
 
-        //if (!await _roleManager.RoleExistsAsync(model.RoleName))
-        //{
-        //    ModelState.AddModelError(nameof(model.RoleName), "That role does not exist.");
-        //    return View(model);
-        //}
+        var email = model.Email.Trim();
+        var roleName = string.IsNullOrWhiteSpace(model.RoleName) ? "User" : model.RoleName.Trim();
+
+        if (!await _roleManager.RoleExistsAsync(roleName))
+        {
+            ModelState.AddModelError(nameof(model.RoleName), "That role does not exist.");
+            return View(model);
+        }
 
         var user = new IdentityUser
         {
-            UserName = model.Email,
-            Email = model.Email,
+            UserName = email,
+            Email = email,
             EmailConfirmed = true
         };
 
@@ -126,11 +175,10 @@ public class AccountController : Controller
             return View(model);
         }
 
-        //await _userManager.AddToRoleAsync(user, model.RoleName);
-        //TempData["StatusMessage"] = $"Account created for {model.Email} with role {model.RoleName}.";
-        TempData["StatusMessage"] = $"Account created for {model.Email}.";
+        await _userManager.AddToRoleAsync(user, roleName);
+        TempData["StatusMessage"] = $"Account created for {email} with role {roleName}.";
 
-        return RedirectToAction(nameof(Register));
+        return RedirectToAction(nameof(Login));
     }
 
     [HttpGet]
@@ -141,13 +189,13 @@ public class AccountController : Controller
         return View();
     }
 
-    private IActionResult RedirectToLocal(string? returnUrl)
+    private IActionResult RedirectToHome(string? returnUrl)
     {
         if (!string.IsNullOrWhiteSpace(returnUrl) && Url.IsLocalUrl(returnUrl))
         {
             return Redirect(returnUrl);
         }
 
-        return RedirectToAction("Index", "Admin", new { area = "Admin" });
+        return RedirectToAction("Index", "Home", new { area = "" });
     }
 }

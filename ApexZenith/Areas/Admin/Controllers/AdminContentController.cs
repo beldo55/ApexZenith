@@ -52,77 +52,76 @@ public class AdminContentController : Controller
         return View(model);
     }
 
+    // ──────────────────────────────────────────────────────────────────────
+    // Generic CRUD helpers
+    //   The public actions below stay thin so MVC's action→view conventions
+    //   keep working, while the shared create/edit/delete/list boilerplate
+    //   lives here once instead of being copy-pasted per entity.
+    // ──────────────────────────────────────────────────────────────────────
+    private async Task<IActionResult> ListAsync<TEntity>(
+        string viewName,
+        Func<IQueryable<TEntity>, IOrderedQueryable<TEntity>> order)
+        where TEntity : class
+    {
+        var model = await order(_context.Set<TEntity>().AsNoTracking()).ToListAsync();
+        return View(viewName, model);
+    }
+
+    private async Task<IActionResult> CreateAsync<TEntity>(
+        TEntity model, string viewName, string fallback, string? returnTo)
+        where TEntity : class
+    {
+        var returnAction = ResolveReturnAction(returnTo, fallback);
+        if (!ModelState.IsValid)
+        {
+            ViewBag.ReturnAction = returnAction;
+            return View(viewName, model);
+        }
+
+        _context.Set<TEntity>().Add(model);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(returnAction);
+    }
+
+    private async Task<IActionResult> EditAsync<TEntity>(
+        int id, TEntity model, string viewName, string fallback, string? returnTo,
+        Action<TEntity, TEntity> apply)
+        where TEntity : class
+    {
+        var returnAction = ResolveReturnAction(returnTo, fallback);
+        if (!ModelState.IsValid)
+        {
+            ViewBag.ReturnAction = returnAction;
+            return View(viewName, model);
+        }
+
+        var item = await _context.Set<TEntity>().FindAsync(id);
+        if (item == null) return NotFound();
+
+        apply(item, model);
+        await _context.SaveChangesAsync();
+        return RedirectToAction(returnAction);
+    }
+
+    private async Task<IActionResult> DeleteConfirmedAsync<TEntity>(
+        int id, string fallback, string? returnTo)
+        where TEntity : class
+    {
+        var item = await _context.Set<TEntity>().FindAsync(id);
+        if (item != null)
+        {
+            _context.Set<TEntity>().Remove(item);
+            await _context.SaveChangesAsync();
+        }
+
+        return RedirectToAction(ResolveReturnAction(returnTo, fallback));
+    }
+
+    // ──────────────────────────────────────────────────────────────────────
+    // About
+    // ──────────────────────────────────────────────────────────────────────
     public async Task<IActionResult> About()
-    {
-        var model = await _context.About
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> Addresses()
-    {
-        var model = await _context.Address
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> Services()
-    {
-        var model = await _context.Services
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> Clients()
-    {
-        var model = await _context.Client
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> TeamMembers()
-    {
-        var model = await _context.Team
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> Testimonials()
-    {
-        var model = await _context.Testimonial
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> Categories()
-    {
-        var model = await _context.NewsCategories
-            .AsNoTracking()
-            .OrderBy(x => x.Id)
-            .ToListAsync();
-        return View(model);
-    }
-
-    public async Task<IActionResult> News()
-    {
-        var model = await _context.News
-            .AsNoTracking()
-            .OrderByDescending(x => x.Date)
-            .ToListAsync();
-        return View(model);
-    }
+        => await ListAsync<About>("About", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateAbout(string? returnTo = null)
     {
@@ -133,18 +132,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateAbout(About model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "About");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.About.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateAbout", "About", returnTo);
 
     public async Task<IActionResult> EditAbout(int id, string? returnTo = null)
     {
@@ -157,23 +145,13 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAbout(int id, About model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "About");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<About>(id, model, "EditAbout", "About", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        var item = await _context.About.FindAsync(id);
-        if (item == null) return NotFound();
-
-        item.Title = model.Title;
-        item.Content = model.Content;
-        item.PhotoUrl = model.PhotoUrl;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Title = m.Title;
+            e.Content = m.Content;
+            e.PhotoUrl = m.PhotoUrl;
+        });
     }
 
     public async Task<IActionResult> DeleteAbout(int id, string? returnTo = null)
@@ -186,16 +164,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteAbout")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAboutConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.About.FindAsync(id);
-        if (item != null)
-        {
-            _context.About.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<About>(id, "About", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "About"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // Address
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> Addresses()
+        => await ListAsync<Address>("Addresses", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateAddress(string? returnTo = null)
     {
@@ -206,18 +181,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateAddress(Address model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "Addresses");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Address.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateAddress", "Addresses", returnTo);
 
     public async Task<IActionResult> EditAddress(int id, string? returnTo = null)
     {
@@ -230,25 +194,15 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditAddress(int id, Address model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "Addresses");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<Address>(id, model, "EditAddress", "Addresses", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        var item = await _context.Address.FindAsync(id);
-        if (item == null) return NotFound();
-
-        item.IsHeadOffice = model.IsHeadOffice;
-        item.Location = model.Location;
-        item.Email = model.Email;
-        item.Phone = model.Phone;
-        item.GoogleMapUrl = model.GoogleMapUrl;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.IsHeadOffice = m.IsHeadOffice;
+            e.Location = m.Location;
+            e.Email = m.Email;
+            e.Phone = m.Phone;
+            e.GoogleMapUrl = m.GoogleMapUrl;
+        });
     }
 
     public async Task<IActionResult> DeleteAddress(int id, string? returnTo = null)
@@ -261,16 +215,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteAddress")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteAddressConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.Address.FindAsync(id);
-        if (item != null)
-        {
-            _context.Address.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<Address>(id, "Addresses", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "Addresses"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // Services
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> Services()
+        => await ListAsync<Services>("Services", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateService(string? returnTo = null)
     {
@@ -281,18 +232,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateService(Services model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "Services");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Services.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateService", "Services", returnTo);
 
     public async Task<IActionResult> EditService(int id, string? returnTo = null)
     {
@@ -305,17 +245,13 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditService(int id, Services model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "Services");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<Services>(id, model, "EditService", "Services", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Update(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Name = m.Name;
+            e.Contents = m.Contents;
+            e.PhotoUrl = m.PhotoUrl;
+        });
     }
 
     public async Task<IActionResult> DeleteService(int id, string? returnTo = null)
@@ -328,16 +264,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteService")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteServiceConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.Services.FindAsync(id);
-        if (item != null)
-        {
-            _context.Services.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<Services>(id, "Services", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "Services"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // Clients
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> Clients()
+        => await ListAsync<Client>("Clients", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateClient(string? returnTo = null)
     {
@@ -348,18 +281,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateClient(Client model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "Clients");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Client.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateClient", "Clients", returnTo);
 
     public async Task<IActionResult> EditClient(int id, string? returnTo = null)
     {
@@ -372,23 +294,13 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditClient(int id, Client model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "Clients");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<Client>(id, model, "EditClient", "Clients", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        var item = await _context.Client.FindAsync(id);
-        if (item == null) return NotFound();
-
-        item.Name = model.Name;
-        item.Logo = model.Logo;
-        item.Website = model.Website;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Name = m.Name;
+            e.Logo = m.Logo;
+            e.Website = m.Website;
+        });
     }
 
     public async Task<IActionResult> DeleteClient(int id, string? returnTo = null)
@@ -401,16 +313,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteClient")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteClientConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.Client.FindAsync(id);
-        if (item != null)
-        {
-            _context.Client.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<Client>(id, "Clients", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "Clients"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // Team
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> TeamMembers()
+        => await ListAsync<Team>("TeamMembers", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateTeam(string? returnTo = null)
     {
@@ -421,18 +330,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateTeam(Team model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "TeamMembers");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Team.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateTeam", "TeamMembers", returnTo);
 
     public async Task<IActionResult> EditTeam(int id, string? returnTo = null)
     {
@@ -445,26 +343,16 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditTeam(int id, Team model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "TeamMembers");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<Team>(id, model, "EditTeam", "TeamMembers", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        var item = await _context.Team.FindAsync(id);
-        if (item == null) return NotFound();
-
-        item.Name = model.Name;
-        item.Position = model.Position;
-        item.PhotoUrl = model.PhotoUrl;
-        item.FacebookUrl = model.FacebookUrl;
-        item.InstergramUrl = model.InstergramUrl;
-        item.LinkedInUrl = model.LinkedInUrl;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Name = m.Name;
+            e.Position = m.Position;
+            e.PhotoUrl = m.PhotoUrl;
+            e.FacebookUrl = m.FacebookUrl;
+            e.InstagramUrl = m.InstagramUrl;
+            e.LinkedInUrl = m.LinkedInUrl;
+        });
     }
 
     public async Task<IActionResult> DeleteTeam(int id, string? returnTo = null)
@@ -477,16 +365,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteTeam")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteTeamConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.Team.FindAsync(id);
-        if (item != null)
-        {
-            _context.Team.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<Team>(id, "TeamMembers", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "TeamMembers"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // Testimonials
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> Testimonials()
+        => await ListAsync<Testimonial>("Testimonials", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateTestimonial(string? returnTo = null)
     {
@@ -497,18 +382,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateTestimonial(Testimonial model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "Testimonials");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Testimonial.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateTestimonial", "Testimonials", returnTo);
 
     public async Task<IActionResult> EditTestimonial(int id, string? returnTo = null)
     {
@@ -521,24 +395,14 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditTestimonial(int id, Testimonial model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "Testimonials");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<Testimonial>(id, model, "EditTestimonial", "Testimonials", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        var item = await _context.Testimonial.FindAsync(id);
-        if (item == null) return NotFound();
-
-        item.Name = model.Name;
-        item.Position = model.Position;
-        item.Content = model.Content;
-        item.PhotoUrl = model.PhotoUrl;
-
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Name = m.Name;
+            e.Position = m.Position;
+            e.Content = m.Content;
+            e.PhotoUrl = m.PhotoUrl;
+        });
     }
 
     public async Task<IActionResult> DeleteTestimonial(int id, string? returnTo = null)
@@ -551,16 +415,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteTestimonial")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteTestimonialConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.Testimonial.FindAsync(id);
-        if (item != null)
-        {
-            _context.Testimonial.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<Testimonial>(id, "Testimonials", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "Testimonials"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // News categories
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> Categories()
+        => await ListAsync<NewsCategory>("Categories", q => q.OrderBy(x => x.Id));
 
     public IActionResult CreateCategory(string? returnTo = null)
     {
@@ -571,18 +432,7 @@ public class AdminContentController : Controller
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CreateCategory(NewsCategory model, string? returnTo = null)
-    {
-        var returnAction = ResolveReturnAction(returnTo, "Categories");
-        if (!ModelState.IsValid)
-        {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.NewsCategories.Add(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
-    }
+        => await CreateAsync(model, "CreateCategory", "Categories", returnTo);
 
     public async Task<IActionResult> EditCategory(int id, string? returnTo = null)
     {
@@ -595,17 +445,11 @@ public class AdminContentController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> EditCategory(int id, NewsCategory model, string? returnTo = null)
     {
-        var returnAction = ResolveReturnAction(returnTo, "Categories");
         if (id != model.Id) return NotFound();
-        if (!ModelState.IsValid)
+        return await EditAsync<NewsCategory>(id, model, "EditCategory", "Categories", returnTo, (e, m) =>
         {
-            ViewBag.ReturnAction = returnAction;
-            return View(model);
-        }
-
-        _context.Update(model);
-        await _context.SaveChangesAsync();
-        return RedirectToAction(returnAction);
+            e.Name = m.Name;
+        });
     }
 
     public async Task<IActionResult> DeleteCategory(int id, string? returnTo = null)
@@ -618,16 +462,13 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteCategory")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteCategoryConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.NewsCategories.FindAsync(id);
-        if (item != null)
-        {
-            _context.NewsCategories.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<NewsCategory>(id, "Categories", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "Categories"));
-    }
+    // ──────────────────────────────────────────────────────────────────────
+    // News (uses a dedicated form model + category lookup, so kept explicit)
+    // ──────────────────────────────────────────────────────────────────────
+    public async Task<IActionResult> News()
+        => await ListAsync<News>("News", q => q.OrderByDescending(x => x.Date));
 
     public IActionResult CreateNews(string? returnTo = null)
     {
@@ -644,7 +485,7 @@ public class AdminContentController : Controller
         if (!ModelState.IsValid)
         {
             ViewBag.ReturnAction = returnAction;
-        ViewBag.CategoryOptions = new SelectList(await _context.NewsCategories.AsNoTracking().OrderBy(x => x.Name).ToListAsync(), "Id", "Name", model.NewsCategoryId);
+            ViewBag.CategoryOptions = new SelectList(await _context.NewsCategories.AsNoTracking().OrderBy(x => x.Name).ToListAsync(), "Id", "Name", model.NewsCategoryId);
             return View(model);
         }
 
@@ -726,17 +567,11 @@ public class AdminContentController : Controller
     [HttpPost, ActionName("DeleteNews")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> DeleteNewsConfirmed(int id, string? returnTo = null)
-    {
-        var item = await _context.News.FindAsync(id);
-        if (item != null)
-        {
-            _context.News.Remove(item);
-            await _context.SaveChangesAsync();
-        }
+        => await DeleteConfirmedAsync<News>(id, "News", returnTo);
 
-        return RedirectToAction(ResolveReturnAction(returnTo, "News"));
-    }
-
+    // ──────────────────────────────────────────────────────────────────────
+    // Helpers
+    // ──────────────────────────────────────────────────────────────────────
     private static string ResolveReturnAction(string? returnTo, string fallback)
     {
         if (!AllowedReturnActions.TryGetValue(fallback, out var resolvedFallback))
